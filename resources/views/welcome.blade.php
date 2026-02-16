@@ -26,11 +26,7 @@
             <!-- Navigation -->
             <nav class="w-full py-6 px-6 lg:px-12 flex justify-between items-center backdrop-blur-md bg-white/70 border-b border-surface-200 sticky top-0 z-50 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-600/20">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('images/davante.png') }}" alt="Davante" class="h-12 w-auto">
                     <span class="text-2xl font-display font-bold text-surface-900 tracking-tight">Gestión<span class="text-primary-600">FFE</span></span>
                 </div>
 
@@ -64,9 +60,7 @@
                                 Empezar Ahora
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                             </a>
-                            <a href="#" class="px-8 py-4 rounded-xl bg-white hover:bg-surface-50 text-surface-800 font-semibold text-lg border border-surface-200 shadow-sm transition-all hover:-translate-y-1 flex items-center justify-center">
-                                Saber más
-                            </a>
+
                         </div>
                     </div>
 
@@ -95,19 +89,17 @@
                             <div class="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
-                            <div class="text-3xl font-display font-bold text-surface-900 mb-1">{{ $stats['cursos'] }}+</div>
+                            <div class="text-3xl font-display font-bold text-surface-900 mb-1">{{ $stats['cursos'] }}</div>
                             <div class="text-surface-500 font-medium">Cursos Académicos</div>
                         </div>
 
-                        <!-- Card 4 - Info -->
-                         <div class="p-6 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800 flex flex-col justify-between text-white shadow-xl shadow-primary-900/20">
-                            <div>
-                                <h3 class="font-display font-bold text-xl mb-2">Portal Interno</h3>
-                                <p class="text-primary-100 text-sm">Davante - Medac</p>
+                        <!-- Card 4 - Convenios -->
+                        <div class="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-surface-200 shadow-lg shadow-surface-200/50 hover:border-primary-200 transition-all group hover:bg-white">
+                            <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             </div>
-                            <div class="self-end p-2 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            </div>
+                            <div class="text-3xl font-display font-bold text-surface-900 mb-1">{{ $stats['convenios'] }}</div>
+                            <div class="text-surface-500 font-medium">Convenios Firmados</div>
                         </div>
 
                     </div>

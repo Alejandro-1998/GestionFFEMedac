@@ -1,28 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tablero Principal') }}
-        </h2>
+        <div class="flex items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Tablero Principal') }}
+            </h2>
+            <span class="text-gray-500 font-normal text-sm ml-4">{{ __('Aquí tienes un resumen de los datos y de los convenios.') }}</span>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <!-- Bienvenida -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-4 text-gray-900">
-                    @php
-                        $rolDisplay = match(Auth::user()->rol) {
-                            'admin' => 'Administrador',
-                            'profesor' => 'Profesor',
-                            'alumno' => 'Alumno',
-                            default => 'Usuario'
-                        };
-                    @endphp
-                    <h3 class="text-lg font-bold text-gray-800">¡Bienvenido, {{ $rolDisplay }} {{ Auth::user()->nombre }}!</h3>
-                    <p class="text-gray-600 mt-1 text-sm">Aquí tienes un resumen de los datos y de los convenios.</p>
-                </div>
-            </div>
+
 
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

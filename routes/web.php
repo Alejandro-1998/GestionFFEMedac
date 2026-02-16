@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Models\CursoAcademico;
+use App\Models\Alumno;
+use App\Models\Convenio;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\SedeController;
@@ -15,8 +17,9 @@ use App\Http\Controllers\CursoAcademicoController;
 Route::get('/', function () {
     $stats = [
         'empresas' => Empresa::count(),
-        'alumnos' => User::where('rol', 'alumno')->count(),
+        'alumnos' => Alumno::count(),
         'cursos' => CursoAcademico::count(),
+        'convenios' => Convenio::count(),
     ];
     return view('welcome', compact('stats'));
 })->name('welcome');
