@@ -10,15 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
-                    <!-- Navegación de Sección Instituto -->
-                    <div class="flex space-x-4 mb-6 border-b pb-4">
-                        <a href="{{ route('alumnos.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium transition duration-300">
-                            Alumnos
-                        </a>
-                        <a href="{{ route('cursos.index') }}" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition duration-300">
-                            Cursos Académicos
-                        </a>
-                    </div>
+
                     
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-bold">Listado de Alumnos</h3>

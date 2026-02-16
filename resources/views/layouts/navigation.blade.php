@@ -20,12 +20,16 @@
                 <!-- Empresas, Alumnos, Convenios (Admin y Profesor) -->
                 @if(Auth::user()->rol === 'admin' || Auth::user()->rol === 'profesor')
                     <div class="hidden sm:-my-px sm:flex">
-                        <x-nav-link :href="route('empresas.index')" :active="request()->routeIs('empresas.*')">
-                            {{ __('Empresas') }}
+                        <x-nav-link :href="route('cursos.index')" :active="request()->routeIs('cursos.*')">
+                            {{ __('Cursos Académicos') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.*') || request()->routeIs('cursos.*')">
+                        <x-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.*')">
                             {{ __('Alumnos') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('empresas.index')" :active="request()->routeIs('empresas.*')">
+                            {{ __('Empresas') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('convenios.index')" :active="request()->routeIs('convenios.*')">
