@@ -91,11 +91,30 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
                 $dniEncriptado = substr($dni, 0, 2) . '**' . substr($dni, 4, 2) . '**' . substr($dni, 8);
             }
 
+            // Email Generation
+            $email = null;
+            if (isset($row[0])) { // nombre_completo
+                 $parts = explode(' ', strtolower($this->removeAccents($row[0])));
+                 $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
+                 
+                 // Clean base email
+                 $baseEmail = preg_replace('/[^a-z0-9\.]/', '', $baseEmail);
+
+                 // Ensure uniqueness
+                 $email = $baseEmail . '@alu.medac.es';
+                 $counter = 1;
+                 while (Alumno::where('email', $email)->exists()) {
+                     $email = $baseEmail . $counter . '@alu.medac.es';
+                     $counter++;
+                 }
+            }
+
             try {
                 Alumno::create([
                     'nombre_completo'    => $row[0] ?? null,
                     'dni'                => $dni,
                     'dni_encriptado'     => $dniEncriptado,
+                    'email'              => $email,
                     'nota_1'             => $this->parseGrade($row[2] ?? null),
                     'nota_2'             => $this->parseGrade($row[3] ?? null),
                     'nota_3'             => $this->parseGrade($row[4] ?? null),
@@ -126,5 +145,14 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
         }
         $value = str_replace([',', "'"], '.', $value);
         return is_numeric($value) ? (float) $value : null;
+    }
+
+    private function removeAccents($string) {
+        $accents = [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
+            'ñ' => 'n', 'Ñ' => 'N'
+        ];
+        return strtr($string, $accents);
     }
 }
