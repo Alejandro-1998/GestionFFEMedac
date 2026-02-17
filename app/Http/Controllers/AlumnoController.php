@@ -219,6 +219,7 @@ class AlumnoController extends Controller
     public function listadoCursoActual(Curso $curso)
     {
         $currentYearId = CursoAcademico::where('actual', true)->value('id');
+        $cursoAcademico = CursoAcademico::find($currentYearId); // Load the model for the view
 
         $alumnos = Alumno::where('curso_id', $curso->id)
             ->where('curso_academico_id', $currentYearId)
@@ -226,7 +227,18 @@ class AlumnoController extends Controller
             ->get()
             ->sortBy('nombre_completo'); // Sorting by name since it's a single string
 
-        return view('alumnos.listado_curso', compact('alumnos', 'curso'));
+        return view('alumnos.listado_curso', compact('alumnos', 'curso', 'cursoAcademico'));
+    }
+
+    public function listadoPorCursoYAcademico(Curso $curso, CursoAcademico $cursoAcademico)
+    {
+        $alumnos = Alumno::where('curso_id', $curso->id)
+            ->where('curso_academico_id', $cursoAcademico->id)
+            ->with(['empresa', 'curso'])
+            ->get()
+            ->sortBy('nombre_completo');
+
+        return view('alumnos.listado_curso', compact('alumnos', 'curso', 'cursoAcademico'));
     }
 
     private function removeAccents($string) {

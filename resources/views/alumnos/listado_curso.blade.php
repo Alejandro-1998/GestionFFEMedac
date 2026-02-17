@@ -11,11 +11,11 @@
                 <div class="p-6 text-gray-900">
                     
                     <div class="mb-6 flex justify-between items-center">
-                        <a href="{{ route('modulos.index') }}" class="text-indigo-600 hover:text-indigo-900 flex items-center">
+                        <a href="{{ url()->previous() }}" class="text-indigo-600 hover:text-indigo-900 flex items-center">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                            Volver a Módulos
+                            Volver atrás
                         </a>
-                        <span class="text-gray-500 text-sm">Curso Académico Actual</span>
+                        <span class="text-gray-500 text-sm">Curso Académico: {{ $cursoAcademico->anyo }}</span>
                     </div>
 
                     <div class="overflow-x-auto">

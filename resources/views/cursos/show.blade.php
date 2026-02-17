@@ -172,18 +172,18 @@
                                     
                                     <div class="space-y-3">
                                         @foreach($modulo->cursos as $subCurso)
-                                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 hover:border-indigo-100 transition-colors group">
+                                            <a href="{{ route('alumnos.curso-academico', ['curso' => $subCurso->id, 'cursoAcademico' => $curso->id]) }}" 
+                                               class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 hover:border-indigo-100 transition-colors group w-full">
                                                 <div class="flex items-center gap-3">
                                                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm">
                                                         {{ $subCurso->nombre }}
                                                     </span>
                                                     <span class="text-gray-600 text-sm font-medium">Alumnos: {{ $subCurso->alumnos->where('curso_academico_id', $curso->id)->count() }}</span>
                                                 </div>
-                                                <a href="{{ route('alumnos.index', ['curso_academico_id' => $curso->id, 'curso_id' => $subCurso->id]) }}" 
-                                                   class="text-indigo-600 text-sm font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    Ver Alumnos &rarr;
-                                                </a>
-                                            </div>
+                                                <span class="text-indigo-600 text-sm font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    Ver Listado &rarr;
+                                                </span>
+                                            </a>
                                         @endforeach
                                     </div>
                                 </div>
