@@ -81,8 +81,9 @@
                                 @foreach ($empresa->empleados as $empleado)
                                     <tr>
                                         <td class="px-3 py-2 whitespace-nowrap">
-                                            <a href="{{ route('empleados.show', $empleado) }}" class="text-blue-600 hover:text-blue-800 hover:underline">
-                                                {{ $empleado->nombre }} {{ $empleado->apellido }} {{ $empleado->apellido2 }}
+                                            <a href="{{ route('empleados.show', $empleado) }}" class="group">
+                                                <span class="text-blue-600 group-hover:text-blue-800 group-hover:underline">{{ $empleado->nombre }} {{ $empleado->apellido }} {{ $empleado->apellido2 }}</span>
+                                                <span class="text-sm text-gray-700 block group-hover:text-gray-900">{{ $empleado->dni_pasaporte }}</span>
                                             </a>
                                         </td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{ $empleado->cargo }}</td>

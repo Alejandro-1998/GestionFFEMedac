@@ -12,6 +12,7 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\CursoAcademicoController;
 
 Route::get('/', function () {
@@ -39,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('empresas', EmpresaController::class)->middleware('can:access-management');
     Route::resource('empleados', EmpleadoController::class)->middleware('can:access-management');
     Route::resource('sedes', SedeController::class)->middleware('can:access-management');
+    Route::get('/modulos/{id}/alumnos', [ModuloController::class, 'showAlumnos'])->name('modulos.showAlumnos')->middleware('can:access-management');
     Route::resource('alumnos', AlumnoController::class)->middleware('can:access-management');
     Route::resource('cursos', CursoAcademicoController::class);
     Route::post('/cursos/{id}/sync-modulos', [CursoAcademicoController::class, 'syncModulos'])->name('cursos.syncModulos')->middleware('can:access-management');

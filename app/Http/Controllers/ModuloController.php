@@ -16,8 +16,19 @@ class ModuloController extends Controller
      */
     public function index()
     {
-        $modulos = Modulo::all();
-        return view('modulos.index', compact('modulos'));
+        $cursoActual = CursoAcademico::where('actual', true)->first();
+
+        if ($cursoActual) {
+            $modulosActivos = $cursoActual->modulos;
+            $otrosModulos = Modulo::whereDoesntHave('cursosAcademicos', function ($query) use ($cursoActual) {
+                $query->where('id', $cursoActual->id);
+            })->get();
+        } else {
+            $modulosActivos = collect();
+            $otrosModulos = Modulo::all();
+        }
+
+        return view('modulos.index', compact('modulosActivos', 'otrosModulos'));
     }
 
     /**
@@ -27,9 +38,9 @@ class ModuloController extends Controller
     {
         $request->validate([
             'nombre' => [
-                'required', 
-                'string', 
-                'max:255', 
+                'required',
+                'string',
+                'max:255',
                 Rule::unique('modulos')
             ],
             'duracion' => 'required|in:1_anyo,2_anyos',
@@ -42,7 +53,7 @@ class ModuloController extends Controller
         ]);
 
         // Create associated Cursos based on duration
-        $cursosParaCrear = match($request->duracion) {
+        $cursosParaCrear = match ($request->duracion) {
             '2_anyos' => ['1º', '2º'],
             '1_anyo' => ['1º'],
             default => ['1º', '2º'], // Fallback
@@ -67,5 +78,29 @@ class ModuloController extends Controller
         $modulo->delete();
 
         return redirect()->back()->with('success', 'Módulo eliminado correctamente.');
+    }
+    /**
+     * Mostrar alumnos de un módulo en el curso académico actual.
+     */
+    public function showAlumnos($id)
+    {
+        $modulo = Modulo::with('cursos')->findOrFail($id);
+        $cursoActual = CursoAcademico::where('actual', true)->first();
+
+        if (!$cursoActual) {
+            return redirect()->back()->with('error', 'No hay un curso académico activo.');
+        }
+
+        // Get module courses (1º, 2º) IDs
+        $cursoIds = $modulo->cursos->pluck('id');
+
+        // Fetch students enrolled in these courses AND the active academic year
+        $alumnos = \App\Models\Alumno::whereIn('curso_id', $cursoIds)
+            ->where('curso_academico_id', $cursoActual->id)
+            ->with(['empresa', 'curso'])
+            ->orderBy('nombre_completo')
+            ->get();
+
+        return view('modulos.show_alumnos', compact('modulo', 'alumnos', 'cursoActual'));
     }
 }

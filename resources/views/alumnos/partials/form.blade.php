@@ -27,9 +27,9 @@
     <!-- Selección de Curso Académico / Módulo / Curso -->
     <div x-data="{
         cursosAcademicos: {{ $cursos->toJson() }},
-        selectedAnyo: '',
-        selectedModulo: '',
-        selectedCurso: '{{ old('curso_id', $alumno->curso_id ?? '') }}',
+        selectedAnyo: {{ old('curso_academico_id', $alumno->curso_academico_id ?? 'null') }},
+        selectedModulo: {{ $alumno && $alumno->curso ? $alumno->curso->modulo_id : 'null' }},
+        selectedCurso: {{ old('curso_id', $alumno->curso_id ?? 'null') }},
         
         get modulosDisponibles() {
             if (!this.selectedAnyo) return [];
@@ -47,21 +47,34 @@
         },
 
         init() {
-            // Si hay un curso seleccionado (edición o error de validación), pre-llenar los selectores
-            if (this.selectedCurso) {
-                // Buscar el curso en la estructura completa para deducir módulo y año
-                for (const ca of this.cursosAcademicos) {
-                    for (const mod of ca.modulos) {
-                        const cursoFound = mod.cursos.find(c => c.id == this.selectedCurso);
-                        if (cursoFound) {
-                            this.selectedAnyo = ca.id;
-                            this.selectedModulo = mod.id;
-                            return;
+            // Si ya tenemos valores seleccionados (Edición), no necesitamos deducir nada,
+            // pero si estamos en un error de validación donde old('curso_id') existe pero modulo no (porque no se envía),
+            // entonces sí necesitamos deducir el módulo.
+            
+            if (this.selectedCurso && !this.selectedModulo) {
+                 // Deducir módulo y año si falta alguno
+                 for (const ca of this.cursosAcademicos) {
+                    // Si ya tenemos año, solo buscamos en ese año (optimización)
+                    if (this.selectedAnyo && ca.id != this.selectedAnyo) continue;
+
+                    if (ca.modulos) {
+                        for (const mod of ca.modulos) {
+                            const cursoFound = mod.cursos.find(c => c.id == this.selectedCurso);
+                            if (cursoFound) {
+                                if (!this.selectedAnyo) this.selectedAnyo = ca.id;
+                                // Retrasar asignación del módulo para asegurar que el watcher de anyo actualice la lista
+                                setTimeout(() => {
+                                     this.selectedModulo = mod.id;
+                                }, 50);
+                                return;
+                            }
                         }
                     }
-                }
-            } else {
-                 // Pre-seleccionar el curso académico actual si existe
+                 }
+            }
+            
+            // Si es 'Nuevo Alumno' (sin selección previa), seleccionar el año actual
+            if (!this.selectedAnyo && !this.selectedCurso) {
                  const actual = this.cursosAcademicos.find(c => c.actual);
                  if (actual) {
                      this.selectedAnyo = actual.id;

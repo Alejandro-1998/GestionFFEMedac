@@ -18,7 +18,7 @@ class AlumnoController extends Controller
     public function index(Request $request)
     {
         // Eager load curso (and its module -> years) and the direct cursoAcademico
-        $query = Alumno::with(['empresa', 'curso.modulo.cursosAcademicos', 'cursoAcademico']);
+        $query = Alumno::with(['empresa', 'curso.modulo', 'cursoAcademico']);
 
         // Filter by professor's courses not directly implemented yet in new schema for brevity
         // Assuming Admin for now or need to traverse User -> Curso -> Alumno
