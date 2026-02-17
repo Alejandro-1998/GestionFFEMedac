@@ -37,7 +37,7 @@
                         <div class="space-y-3">
                             @foreach($modulo->cursos as $curso)
                                 <a href="{{ route('alumnos.index', ['search' => '', 'curso_academico_id' => $curso->id]) }}" 
-                                   class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 hover:shadow-sm transition-all duration-200 group block">
+                                   class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 hover:shadow-sm transition-all duration-200 group">
                                     <div class="flex items-center gap-3">
                                         <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm">
                                             {{ $curso->nombre }}
