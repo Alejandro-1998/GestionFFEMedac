@@ -15,7 +15,14 @@
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                             Volver atrás
                         </a>
-                        <span class="text-gray-500 text-sm">Curso Académico: {{ $cursoAcademico->anyo }}</span>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('alumnos.exportar-pdf', ['curso' => $curso->id, 'cursoAcademico' => $cursoAcademico->id]) }}" 
+                               class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-4 rounded inline-flex items-center transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Exportar PDF
+                            </a>
+                            <span class="text-gray-500 text-sm">Curso Académico: {{ $cursoAcademico->anyo }}</span>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -60,15 +67,15 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div class="flex gap-4">
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_1 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_2 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_3 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_4 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_5 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_6 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_7 ?? '-' }}</span>
-                                                <span class="text-green-600 font-bold w-4 text-center">{{ $alumno->nota_8 ?? '-' }}</span>
+                                            <div class="grid grid-cols-8 divide-x divide-gray-200 border border-gray-200 rounded-lg overflow-hidden bg-white text-xs">
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_1) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_1 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_2) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_2 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_3) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_3 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_4) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_4 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_5) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_5 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_6) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_6 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_7) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_7 ?? '-' }}</div>
+                                                <div class="h-full px-1 py-1 text-center flex items-center justify-center {{ isset($alumno->nota_8) ? 'font-bold text-green-800 bg-green-100' : 'text-gray-300 bg-gray-50' }}">{{ $alumno->nota_8 ?? '-' }}</div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -9,6 +9,7 @@ use \Illuminate\Support\Facades\Hash;
 use App\Models\Curso;
 use App\Models\CursoAcademico;
 use App\Models\Alumno;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AlumnoController extends Controller
 {
@@ -239,6 +240,22 @@ class AlumnoController extends Controller
             ->sortBy('nombre_completo');
 
         return view('alumnos.listado_curso', compact('alumnos', 'curso', 'cursoAcademico'));
+    }
+
+    public function exportarPdfListado(Curso $curso, CursoAcademico $cursoAcademico)
+    {
+        $alumnos = Alumno::where('curso_id', $curso->id)
+            ->where('curso_academico_id', $cursoAcademico->id)
+            ->with(['empresa', 'curso'])
+            ->get()
+            ->sortBy('nombre_completo');
+
+        // Use a landscape view or standard portrait depending on data. 
+        // Portrait usually fits 3 columns fine.
+        $pdf = Pdf::loadView('cursos.pdf_alumnos', compact('alumnos', 'curso', 'cursoAcademico'));
+        
+        // Return stream or download
+        return $pdf->download('Listado_Alumnos_' . $curso->nombre . '_' . $cursoAcademico->anyo . '.pdf');
     }
 
     private function removeAccents($string) {
