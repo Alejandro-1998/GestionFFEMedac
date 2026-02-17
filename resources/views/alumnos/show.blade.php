@@ -35,10 +35,18 @@
                     <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
                         <h4 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Información Académica</h4>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Curso Académico</h4>
-                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->cursoAcademico ? $alumno->cursoAcademico->anyo : ($alumno->curso ? $alumno->curso->anyo : 'Sin asignar') }}</p>
+                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->cursoAcademico ? $alumno->cursoAcademico->anyo : 'Sin asignar' }}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Módulo</h4>
+                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->curso && $alumno->curso->modulo ? $alumno->curso->modulo->nombre : 'Sin asignar' }}</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Curso</h4>
+                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->curso ? $alumno->curso->nombre : 'Sin asignar' }}</p>
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Empresa Asignada</h4>
@@ -52,23 +60,30 @@
                                     @endif
                                 </p>
                             </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Nota Media</h4>
-                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->nota_media ?? 'N/A' }}</p>
-                            </div>
                         </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6 shadow-sm">
-                        <h4 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Calificaciones</h4>
-                        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between mb-4 border-b pb-2">
+                            <h4 class="text-lg font-semibold text-gray-700">Calificaciones</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500 uppercase tracking-wider mr-2">Nota Media:</span>
+                                <span class="text-xl font-bold {{ $alumno->nota_media >= 5 ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $alumno->nota_media ?? 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-start gap-4 overflow-x-auto py-2">
                             @for($i = 1; $i <= 8; $i++)
-                                <li class="flex items-center justify-between border-b border-gray-100 pb-2">
-                                    <span class="text-gray-600 font-medium">Nota {{ $i }}</span>
-                                    <span class="font-bold text-gray-900">{{ $alumno->{'nota_'.$i} ?? '-' }}</span>
-                                </li>
+                                <div class="flex flex-col items-center min-w-[3rem]">
+                                    <span class="text-xs text-gray-400 uppercase mb-1">N{{ $i }}</span>
+                                    <span class="text-lg font-bold text-green-600">
+                                        {{ $alumno->{'nota_'.$i} ?? '-' }}
+                                    </span>
+                                </div>
                             @endfor
-                        </ul>
+                        </div>
                     </div>
 
 

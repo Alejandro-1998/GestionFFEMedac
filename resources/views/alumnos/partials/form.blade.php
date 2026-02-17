@@ -24,12 +24,13 @@
         @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
     </div>
 
-    <!-- Selección de Curso Académico / Módulo / Curso -->
+    <!-- Selección de Curso Académico / Módulo / Curso (Solo para creación) -->
+    @if(!$alumno)
     <div x-data="{
         cursosAcademicos: {{ $cursos->toJson() }},
-        selectedAnyo: {{ old('curso_academico_id', $alumno->curso_academico_id ?? 'null') }},
-        selectedModulo: {{ $alumno && $alumno->curso ? $alumno->curso->modulo_id : 'null' }},
-        selectedCurso: {{ old('curso_id', $alumno->curso_id ?? 'null') }},
+        selectedAnyo: '',
+        selectedModulo: '',
+        selectedCurso: '',
         
         get modulosDisponibles() {
             if (!this.selectedAnyo) return [];
@@ -47,32 +48,6 @@
         },
 
         init() {
-            // Si ya tenemos valores seleccionados (Edición), no necesitamos deducir nada,
-            // pero si estamos en un error de validación donde old('curso_id') existe pero modulo no (porque no se envía),
-            // entonces sí necesitamos deducir el módulo.
-            
-            if (this.selectedCurso && !this.selectedModulo) {
-                 // Deducir módulo y año si falta alguno
-                 for (const ca of this.cursosAcademicos) {
-                    // Si ya tenemos año, solo buscamos en ese año (optimización)
-                    if (this.selectedAnyo && ca.id != this.selectedAnyo) continue;
-
-                    if (ca.modulos) {
-                        for (const mod of ca.modulos) {
-                            const cursoFound = mod.cursos.find(c => c.id == this.selectedCurso);
-                            if (cursoFound) {
-                                if (!this.selectedAnyo) this.selectedAnyo = ca.id;
-                                // Retrasar asignación del módulo para asegurar que el watcher de anyo actualice la lista
-                                setTimeout(() => {
-                                     this.selectedModulo = mod.id;
-                                }, 50);
-                                return;
-                            }
-                        }
-                    }
-                 }
-            }
-            
             // Si es 'Nuevo Alumno' (sin selección previa), seleccionar el año actual
             if (!this.selectedAnyo && !this.selectedCurso) {
                  const actual = this.cursosAcademicos.find(c => c.actual);
@@ -119,6 +94,28 @@
             @error('curso_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
     </div>
+    @else
+        <!-- Mostrar datos académicos como solo lectura -->
+        <div class="mt-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+            <h4 class="text-sm font-medium text-gray-900 border-b pb-2 mb-3">Datos Académicos</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                   <span class="block text-gray-500 font-medium">Año Académico</span>
+                   <span class="text-gray-800">{{ $alumno->cursoAcademico ? $alumno->cursoAcademico->anyo : '-' }}</span>
+                </div>
+                <div>
+                   <span class="block text-gray-500 font-medium">Módulo</span>
+                   <span class="text-gray-800">{{ $alumno->curso && $alumno->curso->modulo ? $alumno->curso->modulo->nombre : '-' }}</span>
+                </div>
+                <div>
+                   <span class="block text-gray-500 font-medium">Curso</span>
+                   <span class="text-gray-800">{{ $alumno->curso ? $alumno->curso->nombre : '-' }}</span>
+                </div>
+            </div>
+            <!-- Hidden inputs to prevent validation errors if fields are required, though controller updates ignore missing. -->
+            <!-- Actually, if validation requires curso_id, we might need hidden inputs. Checking controller... nullable for update. So fine. -->
+        </div>
+    @endif
 
 
 

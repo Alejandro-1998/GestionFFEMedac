@@ -44,10 +44,13 @@ class AlumnoController extends Controller
              $cursosDisponibles = Curso::whereHas('modulo.cursosAcademicos', function($q) use ($request) {
                  $q->where('curso_academico_modulo.curso_academico_id', $request->curso_academico_id);
              })->with('modulo')->get();
+        } else {
+             // If no academic year selected, show all courses
+             $cursosDisponibles = Curso::with('modulo')->get();
         }
 
         // Filter by specific Module/Course
-        if ($request->filled('curso_id') && $request->filled('curso_academico_id')) {
+        if ($request->filled('curso_id')) {
             $query->where('curso_id', $request->curso_id);
         }
 
@@ -211,6 +214,19 @@ class AlumnoController extends Controller
         $alumno = Alumno::findOrFail($id);
         $alumno->delete();
         return redirect()->route('alumnos.index')->with('success', 'Alumno eliminado correctamente.');
+    }
+
+    public function listadoCursoActual(Curso $curso)
+    {
+        $currentYearId = CursoAcademico::where('actual', true)->value('id');
+
+        $alumnos = Alumno::where('curso_id', $curso->id)
+            ->where('curso_academico_id', $currentYearId)
+            ->with(['empresa', 'curso']) // Eager load
+            ->get()
+            ->sortBy('nombre_completo'); // Sorting by name since it's a single string
+
+        return view('alumnos.listado_curso', compact('alumnos', 'curso'));
     }
 
     private function removeAccents($string) {

@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('empleados', EmpleadoController::class)->middleware('can:access-management');
     Route::resource('sedes', SedeController::class)->middleware('can:access-management');
     Route::get('/modulos/{id}/alumnos', [ModuloController::class, 'showAlumnos'])->name('modulos.showAlumnos')->middleware('can:access-management');
+    Route::get('/cursos/{curso}/alumnos-actuales', [AlumnoController::class, 'listadoCursoActual'])->name('alumnos.curso-actual')->middleware('can:access-management');
     Route::resource('alumnos', AlumnoController::class)->middleware('can:access-management');
     Route::resource('cursos', CursoAcademicoController::class);
     Route::post('/cursos/{id}/sync-modulos', [CursoAcademicoController::class, 'syncModulos'])->name('cursos.syncModulos')->middleware('can:access-management');

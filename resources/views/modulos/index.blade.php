@@ -43,14 +43,20 @@
                                 </div>
                                 
                                 <div class="space-y-3">
+                                    @php
+                                        // $currentYearId is used in other places? If not needed for the link, I can remove it if it was only for the old link.
+                                        // But I need to count students. The count logic: $curso->alumnos->where('curso_academico_id', $currentYearId)->count()
+                                        // So I keep $currentYearId logic.
+                                        $currentYearId = \App\Models\CursoAcademico::where('actual', true)->value('id');
+                                    @endphp
                                     @foreach($modulo->cursos as $curso)
-                                        <a href="{{ route('modulos.showAlumnos', $modulo->id) }}" 
+                                        <a href="{{ route('alumnos.curso-actual', $curso->id) }}" 
                                            class="flex items-center justify-between p-3 bg-indigo-50/50 rounded-lg border border-indigo-100 hover:bg-indigo-50 hover:border-indigo-200 hover:shadow-sm transition-all duration-200 group">
                                             <div class="flex items-center gap-3">
                                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm">
                                                     {{ $curso->nombre }}
                                                 </span>
-                                                <span class="text-gray-600 text-sm font-medium">Alumnos: {{ $curso->alumnos->where('curso_academico_id', \App\Models\CursoAcademico::where('actual', true)->value('id'))->count() }}</span>
+                                                <span class="text-gray-600 text-sm font-medium">Alumnos del curso actual: {{ $curso->alumnos->where('curso_academico_id', $currentYearId)->count() }}</span>
                                             </div>
                                             <span class="text-indigo-600 text-sm font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
                                                 Ver Listado &rarr;
@@ -83,13 +89,13 @@
                                 
                                 <div class="space-y-3">
                                     @foreach($modulo->cursos as $curso)
-                                        <a href="{{ route('alumnos.index', ['search' => '', 'curso_academico_id' => $curso->id]) }}" 
+                                        <a href="{{ route('alumnos.index', ['search' => '', 'curso_id' => $curso->id]) }}" 
                                            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 hover:shadow-sm transition-all duration-200 group">
                                             <div class="flex items-center gap-3">
                                                 <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold text-sm">
                                                     {{ $curso->nombre }}
                                                 </span>
-                                                <span class="text-gray-600 text-sm font-medium">Alumnos: {{ $curso->alumnos->count() }}</span>
+                                                <span class="text-gray-600 text-sm font-medium">Alumnos totales: {{ $curso->alumnos->count() }}</span>
                                             </div>
                                             <span class="text-indigo-600 text-sm font-medium hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
                                                 Ver &rarr;
