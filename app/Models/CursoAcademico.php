@@ -14,18 +14,15 @@ class CursoAcademico extends Model
 
     protected $fillable = [
         'anyo',
-        'ciclo_id',
+        'actual',
     ];
 
-    public function ciclo()
+    public function modulos()
     {
-        return $this->belongsTo(Ciclo::class);
+        return $this->belongsToMany(Modulo::class, 'curso_academico_modulo');
     }
 
-    public function empresas()
-    {
-        return $this->belongsToMany(Empresa::class, 'curso_academico_empresa');
-    }
+
 
     public function convenios()
     {

@@ -57,11 +57,15 @@ class ConvenioController extends Controller
     {
         // Fetch Alumnos with their related Curso (implicit if loaded or just use all)
         /** @var \App\Models\User $user */
-        /** @var \App\Models\User $user */
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user && $user->rol === 'profesor') {
+            // Get years assigned to professor
             $cursoIds = $user->cursos()->pluck('cursos_academicos.id');
-            $alumnos = \App\Models\Alumno::whereIn('curso_academico_id', $cursoIds)
+            
+            // Get students in those years via nested relationship
+            $alumnos = \App\Models\Alumno::whereHas('curso.modulo', function($q) use ($cursoIds) {
+                            $q->whereIn('curso_academico_id', $cursoIds);
+                        })
                         ->whereDoesntHave('convenios')
                         ->get();
             $cursos = $user->cursos;
@@ -160,18 +164,22 @@ class ConvenioController extends Controller
             return redirect()->back()->with('error', 'No se han configurado las horas globales.');
         }
 
-        $convenios = Convenio::with('curso')->get();
+        $convenios = Convenio::with('alumno.curso')->get();
         $count = 0;
 
         foreach ($convenios as $convenio) {
             /** @var \App\Models\Convenio $convenio */
             $updated = false;
-            if ($convenio->curso && str_contains($convenio->curso->anyo, '1º')) {
-                $convenio->total_horas = $horas1;
-                $updated = true;
-            } elseif ($convenio->curso && str_contains($convenio->curso->anyo, '2º')) {
-                $convenio->total_horas = $horas2;
-                $updated = true;
+            
+            // Check student's course (1º or 2º)
+            if ($convenio->alumno && $convenio->alumno->curso) {
+                if (str_contains($convenio->alumno->curso->nombre, '1º')) {
+                    $convenio->total_horas = $horas1;
+                    $updated = true;
+                } elseif (str_contains($convenio->alumno->curso->nombre, '2º')) {
+                    $convenio->total_horas = $horas2;
+                    $updated = true;
+                }
             }
 
             if ($updated) {

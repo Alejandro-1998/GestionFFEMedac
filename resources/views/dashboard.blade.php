@@ -86,6 +86,10 @@
                             Accesos Rápidos
                         </h4>
                         <div class="grid grid-cols-2 gap-4">
+                            <a href="{{ route('cursos.index') }}" class="block p-4 bg-orange-50 hover:bg-orange-100 rounded-lg text-center transition duration-300">
+                                <span class="block text-orange-700 font-bold mb-1">Cursos Académicos</span>
+                                <span class="text-xs text-orange-600">Administrar años escolares</span>
+                            </a>
                             <a href="{{ route('alumnos.index') }}" class="block p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg text-center transition duration-300">
                                 <span class="block text-indigo-700 font-bold mb-1">Gestionar Alumnos</span>
                                 <span class="text-xs text-indigo-600">Ver listado completo</span>
@@ -97,10 +101,6 @@
                             <a href="{{ route('convenios.index') }}" class="block p-4 bg-green-50 hover:bg-green-100 rounded-lg text-center transition duration-300">
                                 <span class="block text-green-700 font-bold mb-1">Gestionar Convenios</span>
                                 <span class="text-xs text-green-600">Crear y supervisar acuerdos</span>
-                            </a>
-                            <a href="{{ route('cursos.index') }}" class="block p-4 bg-orange-50 hover:bg-orange-100 rounded-lg text-center transition duration-300">
-                                <span class="block text-orange-700 font-bold mb-1">Cursos Académicos</span>
-                                <span class="text-xs text-orange-600">Administrar años escolares</span>
                             </a>
                             @if(Auth::user()->rol === 'admin')
                             <a href="{{ route('profesores.index') }}" class="block p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-center transition duration-300">

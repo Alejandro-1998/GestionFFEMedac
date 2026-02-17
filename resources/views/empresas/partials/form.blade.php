@@ -11,13 +11,23 @@
         </template>
     </div>
 
-    <!-- CIF -->
+    <!-- Email -->
     <div>
-        <label for="cif" class="block text-sm font-medium text-gray-700">CIF</label>
-        <input type="text" name="cif" id="cif" value="{{ old('cif', $empresa?->cif) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-        @error('cif') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-        <template x-if="typeof errors !== 'undefined' && errors.cif">
-            <span x-text="errors.cif[0]" class="text-red-500 text-xs"></span>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" name="email" id="email" value="{{ old('email', $empresa?->email) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <template x-if="typeof errors !== 'undefined' && errors.email">
+            <span x-text="errors.email[0]" class="text-red-500 text-xs"></span>
+        </template>
+    </div>
+
+    <!-- NIF -->
+    <div>
+        <label for="nif" class="block text-sm font-medium text-gray-700">NIF</label>
+        <input type="text" name="nif" id="nif" value="{{ old('nif', $empresa?->nif) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+        @error('nif') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <template x-if="typeof errors !== 'undefined' && errors.nif">
+            <span x-text="errors.nif[0]" class="text-red-500 text-xs"></span>
         </template>
     </div>
 
@@ -41,46 +51,53 @@
         </template>
     </div>
 
-    <!-- Ciclos Formativos -->
+    <!-- Módulos Formativos -->
     <div class="md:col-span-2">
-        <span class="block text-sm font-medium text-gray-700 mb-2">Ciclos Formativos Asociados <span class="text-red-500">*</span></span>
+        <span class="block text-sm font-medium text-gray-700 mb-2">Módulos Asociados <span class="text-red-500">*</span></span>
         
         @if($empresa)
-            <!-- Edit Mode: Read Only -->
+            <!-- Edit Mode: Read Only (or make editable if desired, but sticking to logic) -->
+            <!-- Actually, usually editable. But controller update logic didn't sync. Let's make it editable if easy, or keep read-only as per previous comment -->
+            <!-- Previous code said "Edit Mode: Read Only". I will keep it read only for now to match controller logic, or update controller to support sync. 
+                 Controller update method (step 318) had commented out sync.
+                 For now, let's keep it consistent: allow editing if I uncommented in controller, but for now just display.
+                 Actually, best to allow editing. I will update controller later if needed. Use same logic as Create for consistency if possible?
+                 No, the previous code had a specific Read Only block. I will stick to that but use Modulos. -->
             <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
-                @if($empresa->ciclos->count() > 0)
+                @if($empresa->modulos->count() > 0)
                     <div class="flex flex-wrap gap-2">
-                        @foreach($empresa->ciclos as $ciclo)
+                        @foreach($empresa->modulos as $modulo)
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {{ $ciclo->nombre }}
+                                {{ $modulo->nombre }}
                             </span>
                         @endforeach
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">Los ciclos no se pueden modificar en la edición.</p>
                 @else
-                    <p class="text-sm text-gray-500">No hay ciclos asociados.</p>
+                    <p class="text-sm text-gray-500">No hay módulos asociados.</p>
                 @endif
             </div>
         @else
             <!-- Create Mode: Editable -->
-            @if(isset($ciclos) && count($ciclos) > 0)
+            @if(isset($modulos) && count($modulos) > 0)
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($ciclos as $ciclo)
+                    @foreach($modulos as $modulo)
                         <div class="flex items-center">
-                            <input type="checkbox" name="ciclos[]" value="{{ $ciclo->id }}" id="ciclo_{{ $ciclo->id }}" 
+                            <input type="checkbox" name="modulos[]" value="{{ $modulo->id }}" id="modulo_{{ $modulo->id }}" 
                                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                @if(old('ciclos') && in_array($ciclo->id, old('ciclos'))) checked @endif>
-                            <label for="ciclo_{{ $ciclo->id }}" class="ml-2 text-sm text-gray-700">{{ $ciclo->nombre }}</label>
+                                @if(old('modulos') && in_array($modulo->id, old('modulos'))) checked @endif>
+                            <label for="modulo_{{ $modulo->id }}" class="ml-2 text-sm text-gray-700">
+                                {{ $modulo->nombre }}
+                            </label>
                         </div>
                     @endforeach
                 </div>
-                <p class="text-xs text-gray-500 mt-1">Seleccionar un ciclo asociará automáticamente todos los cursos de ese grado.</p>
-                @error('ciclos') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                <template x-if="typeof errors !== 'undefined' && errors.ciclos">
-                    <span x-text="errors.ciclos[0]" class="text-red-500 text-sm mt-1 block"></span>
+                <p class="text-xs text-gray-500 mt-1">Seleccionar un módulo asociará automáticamente a la empresa con este.</p>
+                @error('modulos') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                <template x-if="typeof errors !== 'undefined' && errors.modulos">
+                    <span x-text="errors.modulos[0]" class="text-red-500 text-sm mt-1 block"></span>
                 </template>
             @else
-                <p class="text-red-500 text-sm">No hay ciclos registrados en el sistema.</p>
+                <p class="text-red-500 text-sm">No hay módulos registrados en el sistema.</p>
             @endif
         @endif
     </div>

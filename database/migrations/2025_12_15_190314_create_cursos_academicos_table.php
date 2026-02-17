@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cursos_academicos', function (Blueprint $table) {
             $table->id();
             $table->string("anyo");
+            $table->boolean('actual')->default(false);
 
             $table->timestamps();
         });

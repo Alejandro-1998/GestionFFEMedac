@@ -24,6 +24,10 @@
                             {{ __('Cursos Académicos') }}
                         </x-nav-link>
 
+                        <x-nav-link :href="route('modulos.index')" :active="request()->routeIs('modulos.*')">
+                            {{ __('Módulos') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.*')">
                             {{ __('Alumnos') }}
                         </x-nav-link>

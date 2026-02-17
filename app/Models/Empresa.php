@@ -13,12 +13,7 @@ class Empresa extends Model
     protected $table = 'empresas';
     protected $primaryKey = 'id';
 
-    protected $fillable = [
-        'nombre',
-        'cif',
-        'direccion',
-        'telefono'
-    ];
+    protected $fillable = ['nombre', 'email', 'telefono', 'direccion', 'nif', 'convenio_path'];
 
     public function sedes()
     {
@@ -40,8 +35,8 @@ class Empresa extends Model
         return $this->belongsToMany(CursoAcademico::class, 'curso_academico_empresa');
     }
 
-    public function ciclos()
+    public function modulos()
     {
-        return $this->belongsToMany(Ciclo::class, 'ciclo_empresa');
+        return $this->belongsToMany(Modulo::class, 'empresa_modulo');
     }
 }

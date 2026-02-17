@@ -23,8 +23,15 @@ class Alumno extends Model
         'nota_8',
         'nota_media',
         'empresa_id',
+        'curso_id',
         'curso_academico_id',
+        'email',
     ];
+
+    public function cursoAcademico()
+    {
+        return $this->belongsTo(CursoAcademico::class);
+    }
 
     /**
      * The "booted" method of the model.
@@ -81,6 +88,6 @@ class Alumno extends Model
 
     public function curso()
     {
-        return $this->belongsTo(CursoAcademico::class, 'curso_academico_id');
+        return $this->belongsTo(Curso::class, 'curso_id');
     }
 }

@@ -18,7 +18,8 @@ class EmpresaFactory extends Factory
     {
         return [
             'nombre' => fake()->company(),
-            'cif' => fake()->bothify('########A'),
+            'email' => fake()->unique()->companyEmail(),
+            'nif' => fake()->bothify('########A'),
             'direccion' => fake()->address(),
             'telefono' => fake()->phoneNumber(),
         ];

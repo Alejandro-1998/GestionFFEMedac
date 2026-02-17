@@ -10,25 +10,33 @@ use Illuminate\Support\Facades\Auth;
 class CursoAcademicoController extends Controller
 {
     /**
-     * Listado de Cursos Académicos.
+     * Marcar un curso como actual.
+     */
+    public function marcarComoActual($id)
+    {
+        // Set all to false
+        CursoAcademico::query()->update(['actual' => false]);
+        
+        // Set the requested one to true
+        $curso = CursoAcademico::findOrFail($id);
+        $curso->update(['actual' => true]);
+
+        return redirect()->back()->with('success', 'Curso marcado como actual correctamente.');
+    }
+
+    /**
+     * Listado de Cursos Académicos (Años).
      */
     public function index(Request $request)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        
-        if ($user->rol === 'profesor') {
-            $query = $user->cursos()->getQuery();
-        } else {
-            $query = CursoAcademico::query();
-        }
+        $query = CursoAcademico::query();
 
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where('anyo', 'like', "%{$search}%");
         }
 
-        $cursos = $query->orderBy('cursos_academicos.id', 'asc')->paginate(10);
+        $cursos = $query->orderBy('anyo', 'desc')->paginate(10);
         
         if ($request->ajax()) {
             return view('cursos.partials.cards', compact('cursos'));
@@ -38,39 +46,44 @@ class CursoAcademicoController extends Controller
     }
 
     /**
-     * Guardar un Curso Académico.
+     * Guardar un Curso Académico (Año).
      */
     public function store(Request $request)
     {
         $request->validate([
-            'anyo' => 'required|string|max:255',
-
+            'anyo' => 'required|string|max:255|unique:cursos_academicos,anyo',
         ]);
 
         CursoAcademico::create([
             'anyo' => $request->anyo,
-
         ]);
 
-        return redirect()->route('cursos.index')->with('success', 'Curso académico creado correctamente.');
+        return redirect()->route('cursos.index')->with('success', 'Año académico creado correctamente.');
     }
 
     /**
-     * Muestra un Curos Académico.
+     * Muestra un Curso Académico (Año) y sus Módulos.
+     */
+    /**
+     * Muestra un Curso Académico (Año) y sus Módulos.
      */
     public function show($id)
     {
-        $curso = CursoAcademico::with(['convenios.alumno', 'convenios.empresa', 'alumnos.empresa'])->findOrFail($id);
+        $curso = CursoAcademico::with('modulos.cursos')->findOrFail($id);
+        $todosLosModulos = \App\Models\Modulo::all();
         
-        // Sort students by surname (heuristic: string after first space)
-        $sortedAlumnos = $curso->alumnos->sortBy(function($alumno) {
-            $parts = explode(' ', $alumno->nombre_completo, 2);
-            return isset($parts[1]) ? $parts[1] . ' ' . $parts[0] : $parts[0];
-        })->values();
-        
-        $curso->setRelation('alumnos', $sortedAlumnos);
-        
-        return view('cursos.show', compact('curso'));
+        return view('cursos.show', compact('curso', 'todosLosModulos'));
+    }
+
+    /**
+     * Sincronizar módulos con el curso académico.
+     */
+    public function syncModulos(Request $request, $id)
+    {
+        $curso = CursoAcademico::findOrFail($id);
+        $curso->modulos()->sync($request->input('modulos', []));
+
+        return redirect()->back()->with('success', 'Módulos actualizados correctamente.');
     }
 
     /**
@@ -79,17 +92,15 @@ class CursoAcademicoController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'anyo' => 'required|string|max:255',
-
+            'anyo' => 'required|string|max:255|unique:cursos_academicos,anyo,' . $id,
         ]);
 
         $curso = CursoAcademico::findOrFail($id);
         $curso->update([
             'anyo' => $request->anyo,
-
         ]);
 
-        return redirect()->route('cursos.index')->with('success', 'Curso académico actualizado correctamente.');
+        return redirect()->back()->with('success', 'Año académico actualizado correctamente.');
     }
 
     /**
@@ -98,47 +109,29 @@ class CursoAcademicoController extends Controller
     public function destroy($id)
     {
         $curso = CursoAcademico::findOrFail($id);
+        // Cascade delete should handle related modules/courses via DB constraints? 
+        // Or we can delete related manually if needed but DB constrained ->onDelete('cascade') is set for modulos.
         $curso->delete();
 
-        return redirect()->route('cursos.index')->with('success', 'Curso académico eliminado correctamente.');
+        return redirect()->route('cursos.index')->with('success', 'Año académico eliminado correctamente.');
     }
-
     /**
-     * Importar alumnos desde Excel.
+     * Importar Alumnos desde CSV/Excel
      */
     public function importarAlumnos(Request $request, $id)
     {
         $request->validate([
-            'archivo_excel' => 'required|file|mimes:xlsx,xls,csv,txt',
+            'fichero_alumnos' => 'required|file|mimes:csv,txt,xlsx,xls',
         ]);
 
-        $curso = CursoAcademico::findOrFail($id);
+        $cursoAcademico = CursoAcademico::findOrFail($id);
 
         try {
-            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($curso->id), $request->file('archivo_excel'));
-            return redirect()->route('cursos.show', $curso->id)->with('success', 'Alumnos importados correctamente.');
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($id), $request->file('fichero_alumnos'));
+            return redirect()->back()->with('success', 'Alumnos importados correctamente.');
         } catch (\Exception $e) {
-            Log::error('Controller Import Error: ' . $e->getMessage());
-            return redirect()->route('cursos.show', $curso->id)->with('error', 'Error al importar alumnos: ' . $e->getMessage());
+            Log::error('Error importando alumnos: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al importar alumnos: ' . $e->getMessage());
         }
-    }
-    /**
-     * Exportar alumnos a PDF.
-     */
-    public function exportarPdf($id)
-    {
-        $curso = CursoAcademico::with(['alumnos.empresa'])->findOrFail($id);
-        
-        // Sort students by surname (heuristic: string after first space)
-        $sortedAlumnos = $curso->alumnos->sortBy(function($alumno) {
-            $parts = explode(' ', $alumno->nombre_completo, 2);
-            return isset($parts[1]) ? $parts[1] . ' ' . $parts[0] : $parts[0];
-        })->values();
-        
-        $curso->setRelation('alumnos', $sortedAlumnos);
-        
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cursos.pdf_alumnos', compact('curso'));
-        
-        return $pdf->download('listado_alumnos_' . \Illuminate\Support\Str::slug($curso->anyo) . '.pdf');
     }
 }

@@ -12,7 +12,7 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $alumno->dni }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-            {{ $alumno->curso ? $alumno->curso->anyo : '-' }}
+            {{ $alumno->cursoAcademico ? $alumno->cursoAcademico->anyo : ($alumno->curso ? $alumno->curso->anyo : '-') }}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
             @if($alumno->empresa)
@@ -47,7 +47,7 @@
                         @csrf
                         @method('PUT')
         
-                        @include('alumnos.partials.form', ['alumno' => $alumno])
+                        @include('alumnos.partials.form', ['alumno' => $alumno, 'cursos' => $cursos])
         
                         <div class="mt-8 flex justify-end">
                             <button type="button" x-on:click="$dispatch('close')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition duration-300 mr-2 mb-6">

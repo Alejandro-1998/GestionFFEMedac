@@ -22,8 +22,12 @@
                             <p class="text-lg font-semibold text-gray-800">{{ $empresa->nombre }}</p>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-500">CIF</p>
-                            <p class="text-lg font-semibold text-gray-800">{{ $empresa->cif }}</p>
+                            <p class="text-sm font-medium text-gray-500">Email</p>
+                            <p class="text-lg font-semibold text-gray-800">{{ $empresa->email ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">NIF</p>
+                            <p class="text-lg font-semibold text-gray-800">{{ $empresa->nif }}</p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Dirección</p>
@@ -34,17 +38,17 @@
                             <p class="text-lg font-semibold text-gray-800">{{ $empresa->telefono }}</p>
                         </div>
                         <div class="col-span-1 md:col-span-2">
-                            <p class="text-sm font-medium text-gray-500">Ciclos Asociados</p>
-                            @if($ciclosAsociados->count() > 0)
+                            <p class="text-sm font-medium text-gray-500">Módulos Asociados</p>
+                            @if($modulosAsociados->count() > 0)
                                 <div class="flex flex-wrap gap-2 mt-1">
-                                    @foreach($ciclosAsociados as $ciclo)
+                                    @foreach($modulosAsociados as $modulo)
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {{ $ciclo }}
+                                            {{ $modulo }}
                                         </span>
                                     @endforeach
                                 </div>
                             @else
-                                <p class="text-gray-500 italic">No tiene ciclos asociados.</p>
+                                <p class="text-gray-500 italic">No tiene módulos asociados.</p>
                             @endif
                         </div>
                     </div>

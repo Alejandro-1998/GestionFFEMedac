@@ -12,29 +12,105 @@
         @error('dni') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
     </div>
 
-    <!-- Curso Académico -->
+    <!-- Email -->
     <div class="mt-4">
-        <label for="curso_academico_id" class="block text-sm font-medium text-gray-700">Curso Académico</label>
-        <select name="curso_academico_id" id="curso_academico_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            <option value="">-- Ninguno --</option>
-            @foreach($cursos as $curso)
-                <option value="{{ $curso->id }}" {{ (old('curso_academico_id', $alumno->curso_academico_id ?? '') == $curso->id) ? 'selected' : '' }}>
-                    {{ $curso->anyo }}
-                </option>
-            @endforeach
-        </select>
-        @error('curso_academico_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+        <div class="mt-1 flex rounded-md shadow-sm">
+            <input type="text" name="email" id="email" value="{{ old('email', $alumno ? str_replace('@alu.medac.es', '', $alumno->email) : '') }}" class="flex-1 block w-full rounded-none rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="nombre.apellido" required>
+            <span class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                @alu.medac.es
+            </span>
+        </div>
+        @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+    </div>
+
+    <!-- Selección de Curso Académico / Módulo / Curso -->
+    <div x-data="{
+        cursosAcademicos: {{ $cursos->toJson() }},
+        selectedAnyo: '',
+        selectedModulo: '',
+        selectedCurso: '{{ old('curso_id', $alumno->curso_id ?? '') }}',
+        
+        get modulosDisponibles() {
+            if (!this.selectedAnyo) return [];
+            const ca = this.cursosAcademicos.find(c => c.id == this.selectedAnyo);
+            return ca ? ca.modulos : [];
+        },
+        
+        get cursosDisponibles() {
+            if (!this.selectedModulo || !this.selectedAnyo) return [];
+            // Necesitamos encontrar el módulo dentro del año seleccionado
+            const ca = this.cursosAcademicos.find(c => c.id == this.selectedAnyo);
+            if (!ca) return [];
+            const mod = ca.modulos.find(m => m.id == this.selectedModulo);
+            return mod ? mod.cursos : [];
+        },
+
+        init() {
+            // Si hay un curso seleccionado (edición o error de validación), pre-llenar los selectores
+            if (this.selectedCurso) {
+                // Buscar el curso en la estructura completa para deducir módulo y año
+                for (const ca of this.cursosAcademicos) {
+                    for (const mod of ca.modulos) {
+                        const cursoFound = mod.cursos.find(c => c.id == this.selectedCurso);
+                        if (cursoFound) {
+                            this.selectedAnyo = ca.id;
+                            this.selectedModulo = mod.id;
+                            return;
+                        }
+                    }
+                }
+            } else {
+                 // Pre-seleccionar el curso académico actual si existe
+                 const actual = this.cursosAcademicos.find(c => c.actual);
+                 if (actual) {
+                     this.selectedAnyo = actual.id;
+                 }
+            }
+        }
+    }" class="space-y-4 mt-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+        
+        <h4 class="text-sm font-medium text-gray-900 border-b pb-2 mb-3">Datos Académicos</h4>
+
+        <!-- 1. Curso Académico -->
+        <div>
+            <label for="select_anyo" class="block text-sm font-medium text-gray-700">Curso Académico</label>
+            <select name="curso_academico_id" x-model="selectedAnyo" id="select_anyo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Seleccionar Año --</option>
+                <template x-for="ca in cursosAcademicos" :key="ca.id">
+                    <option :value="ca.id" x-text="ca.anyo + (ca.actual ? ' (Actual)' : '')"></option>
+                </template>
+            </select>
+        </div>
+
+        <!-- 2. Módulo (Ciclo) -->
+        <div>
+            <label for="select_modulo" class="block text-sm font-medium text-gray-700">Módulo (Ciclo)</label>
+            <select x-model="selectedModulo" id="select_modulo" :disabled="!selectedAnyo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400">
+                <option value="">-- Seleccionar Módulo --</option>
+                <template x-for="mod in modulosDisponibles" :key="mod.id">
+                    <option :value="mod.id" x-text="mod.nombre"></option>
+                </template>
+            </select>
+        </div>
+
+        <!-- 3. Curso (1º/2º) -->
+        <div>
+            <label for="curso_id" class="block text-sm font-medium text-gray-700">Año del Curso (1º / 2º)</label>
+            <select name="curso_id" id="curso_id" x-model="selectedCurso" :disabled="!selectedModulo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400" required>
+                <option value="">-- Seleccionar Curso --</option>
+                <template x-for="curso in cursosDisponibles" :key="curso.id">
+                    <option :value="curso.id" x-text="curso.nombre"></option>
+                </template>
+            </select>
+            @error('curso_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+        </div>
     </div>
 
 
 
     <!-- Nota Media -->
-    <div class="mt-4">
-        <label for="nota_media" class="block text-sm font-medium text-gray-700">Nota Media</label>
-        <input type="number" step="0.01" name="nota_media" id="nota_media" value="{{ old('nota_media', $alumno->nota_media ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed shadow-sm focus:border-indigo-500 focus:ring-indigo-500" readonly>
-        <p class="text-xs text-gray-500 mt-1">Se calcula autom&aacute;ticamente al guardar.</p>
-        @error('nota_media') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-    </div>
+
 
     <!-- Calificaciones -->
     <div class="mt-6 border-t pt-4">

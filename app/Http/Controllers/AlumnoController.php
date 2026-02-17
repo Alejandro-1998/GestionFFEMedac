@@ -6,6 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use \Illuminate\Validation\Rules\Password;
 use \Illuminate\Support\Facades\Hash;
+use App\Models\Curso;
+use App\Models\CursoAcademico;
+use App\Models\Alumno;
 
 class AlumnoController extends Controller
 {
@@ -14,16 +17,15 @@ class AlumnoController extends Controller
      */
     public function index(Request $request)
     {
-        $query = \App\Models\Alumno::with(['empresa', 'curso']);
+        // Eager load curso (and its module -> years) and the direct cursoAcademico
+        $query = Alumno::with(['empresa', 'curso.modulo.cursosAcademicos', 'cursoAcademico']);
 
-        // Filter by professor's courses
+        // Filter by professor's courses not directly implemented yet in new schema for brevity
+        // Assuming Admin for now or need to traverse User -> Curso -> Alumno
         /** @var \App\Models\User $user */
         $user = \Illuminate\Support\Facades\Auth::user();
-        if ($user && $user->rol === 'profesor') {
-            $cursoIds = $user->cursos()->pluck('cursos_academicos.id');
-            $query->whereIn('curso_academico_id', $cursoIds);
-        }
-
+        
+        // Search
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -32,21 +34,32 @@ class AlumnoController extends Controller
             });
         }
 
-        if ($request->has('curso_academico_id') && $request->curso_academico_id != '') {
-            $query->where('curso_academico_id', $request->curso_academico_id);
+        $cursosDisponibles = collect(); // Default empty collection
+
+        // Filter by Academic Year (via nested relationship)
+        if ($request->filled('curso_academico_id')) {
+             $query->where('curso_academico_id', $request->curso_academico_id);
+
+             // Fetch available modules/courses for this academic year
+             $cursosDisponibles = Curso::whereHas('modulo.cursosAcademicos', function($q) use ($request) {
+                 $q->where('curso_academico_modulo.curso_academico_id', $request->curso_academico_id);
+             })->with('modulo')->get();
         }
 
-        if ($user && $user->rol === 'profesor') {
-            $cursos = $user->cursos;
-        } else {
-            $cursos = \App\Models\CursoAcademico::all();
+        // Filter by specific Module/Course
+        if ($request->filled('curso_id') && $request->filled('curso_academico_id')) {
+            $query->where('curso_id', $request->curso_id);
         }
-        $alumnos = $query->paginate(10);
+
+        $cursos = CursoAcademico::with(['modulos.cursos'])->get(); // For the creation form dropdowns
+        
+        $alumnos = $query->paginate(10)->withQueryString();
+        
         if ($request->ajax()) {
-            return view('alumnos.partials.table-rows', compact('alumnos', 'cursos'));
+            return view('alumnos.partials.table-rows', compact('alumnos', 'cursos', 'cursosDisponibles'));
         }
 
-        return view('alumnos.index', compact('alumnos', 'cursos'));
+        return view('alumnos.index', compact('alumnos', 'cursos', 'cursosDisponibles'));
     }
 
     /**
@@ -61,12 +74,42 @@ class AlumnoController extends Controller
                 $input[$field] = str_replace(',', '.', $input[$field]);
             }
         }
+
+        // Generate Email if not provided (or overwrite to ensure uniqueness/format)
+        // User request: "los correos de los alumnos deberian ser unicos"
+        // We will generate based on name if not provided, or sanitize provided one.
+        // Actually, let's auto-generate to be safe if it's a common pattern, 
+        // OR just ensure uniqueness by appending count. 
+        // Let's assume we take the provided email or generate from name, then ensure uniqueness.
+        
+        $baseEmail = $input['email'] ?? null;
+        if (!$baseEmail && isset($input['nombre_completo'])) {
+            // Generate from name: juan.perez
+             $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
+             $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
+        }
+
+        // Clean base email
+        $baseEmail = str_replace('@alu.medac.es', '', $baseEmail);
+        $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
+
+        // Ensure uniqueness
+        $email = $baseEmail . '@alu.medac.es';
+        $counter = 1;
+        while (Alumno::where('email', $email)->exists()) {
+            $email = $baseEmail . $counter . '@alu.medac.es';
+            $counter++;
+        }
+        $input['email'] = $email;
+
         $request->merge($input);
 
         $request->validate([
             'nombre_completo' => ['required', 'string', 'max:255'],
             'dni' => ['required', 'string', 'max:15', 'unique:alumnos,dni'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:alumnos,email'],
             'nota_media' => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'curso_id' => ['nullable', 'exists:cursos,id'],
             'curso_academico_id' => ['nullable', 'exists:cursos_academicos,id'],
             'nota_1' => ['nullable', 'numeric', 'min:0', 'max:10'],
             'nota_2' => ['nullable', 'numeric', 'min:0', 'max:10'],
@@ -78,7 +121,7 @@ class AlumnoController extends Controller
             'nota_8' => ['nullable', 'numeric', 'min:0', 'max:10'],
         ]);
 
-        \App\Models\Alumno::create($request->all());
+        Alumno::create($request->all());
 
         return redirect()->route('alumnos.index')->with('success', 'Alumno creado correctamente.');
     }
@@ -88,7 +131,7 @@ class AlumnoController extends Controller
      */
     public function show(string $id)
     {
-        $alumno = \App\Models\Alumno::with(['empresa', 'curso'])->findOrFail($id);
+        $alumno = Alumno::with(['empresa', 'curso.modulo.cursosAcademicos'])->findOrFail($id);
         return view('alumnos.show', compact('alumno'));
     }
 
@@ -104,12 +147,45 @@ class AlumnoController extends Controller
                 $input[$field] = str_replace(',', '.', $input[$field]);
             }
         }
+
+        // Unique Email Logic for Update
+        // If email is empty, generate it. If provided, sanitise/uniquify it ONLY if it changed or if user wants us to correct it.
+        // Actually, for update, we should trust the user input mainly, but apply unique check logic if they changed it.
+        
+        $baseEmail = $input['email'] ?? null;
+        $currentAlumno = Alumno::find($id);
+        
+        // Only regenerate if email field is being updated and it is different or empty
+        if ((!$baseEmail && $currentAlumno) || ($baseEmail && $currentAlumno && $baseEmail !== $currentAlumno->email)) {
+             if (!$baseEmail && isset($input['nombre_completo'])) {
+                 $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
+                 $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
+             }
+             
+             // Clean base email
+             $baseEmail = str_replace('@alu.medac.es', '', $baseEmail);
+             $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
+
+             // Ensure uniqueness (accounting for self)
+             $email = $baseEmail . '@alu.medac.es';
+             $counter = 1;
+             while (Alumno::where('email', $email)->where('id', '!=', $id)->exists()) {
+                 $email = $baseEmail . $counter . '@alu.medac.es';
+                 $counter++;
+             }
+             $input['email'] = $email;
+        } elseif ($baseEmail && !str_ends_with($baseEmail, '@alu.medac.es')) {
+             $input['email'] = $baseEmail . '@alu.medac.es';
+        }
+
         $request->merge($input);
 
         $request->validate([
             'nombre_completo' => ['required', 'string', 'max:255'],
             'dni' => ['required', 'string', 'max:15', 'unique:alumnos,dni,' . $id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:alumnos,email,' . $id],
             'nota_media' => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'curso_id' => ['nullable', 'exists:cursos,id'],
             'curso_academico_id' => ['nullable', 'exists:cursos_academicos,id'],
             'nota_1' => ['nullable', 'numeric', 'min:0', 'max:10'],
             'nota_2' => ['nullable', 'numeric', 'min:0', 'max:10'],
@@ -121,7 +197,7 @@ class AlumnoController extends Controller
             'nota_8' => ['nullable', 'numeric', 'min:0', 'max:10'],
         ]);
 
-        $alumno = \App\Models\Alumno::findOrFail($id);
+        $alumno = Alumno::findOrFail($id);
         $alumno->update($request->all());
 
         return redirect()->route('alumnos.index')->with('success', 'Alumno actualizado correctamente.');
@@ -132,8 +208,17 @@ class AlumnoController extends Controller
      */
     public function destroy(string $id)
     {
-        $alumno = \App\Models\Alumno::findOrFail($id);
+        $alumno = Alumno::findOrFail($id);
         $alumno->delete();
         return redirect()->route('alumnos.index')->with('success', 'Alumno eliminado correctamente.');
+    }
+
+    private function removeAccents($string) {
+        $accents = [
+            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
+            'ñ' => 'n', 'Ñ' => 'N'
+        ];
+        return strtr($string, $accents);
     }
 }

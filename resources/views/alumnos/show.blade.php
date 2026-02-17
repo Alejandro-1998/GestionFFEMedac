@@ -22,7 +22,13 @@
                         </div>
                         <div>
                             <h3 class="text-2xl font-bold text-gray-900">{{ $alumno->nombre_completo }}</h3>
-                            <p class="text-gray-500">DNI: {{ $alumno->dni_encriptado }} (Original: {{ $alumno->dni }})</p>
+                            <p class="text-gray-500">DNI: {{ $alumno->dni }}</p>
+                            <p class="text-gray-500 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <a href="mailto:{{ $alumno->email }}" class="hover:underline">{{ $alumno->email }}</a>
+                            </p>
                         </div>
                     </div>
 
@@ -32,7 +38,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Curso Académico</h4>
-                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->curso ? $alumno->curso->anyo : 'Sin asignar' }}</p>
+                                <p class="mt-1 text-gray-900 font-medium">{{ $alumno->cursoAcademico ? $alumno->cursoAcademico->anyo : ($alumno->curso ? $alumno->curso->anyo : 'Sin asignar') }}</p>
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Empresa Asignada</h4>
@@ -65,8 +71,7 @@
                         </ul>
                     </div>
 
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                        <h4 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Información del Registro</h4>
+
 
                 </div>
             </div>

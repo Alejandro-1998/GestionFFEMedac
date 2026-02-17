@@ -40,6 +40,17 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            @if(request('curso_academico_id') && isset($cursosDisponibles) && $cursosDisponibles->count() > 0)
+                                <select name="curso_id" class="rounded-l-none border-l-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm mr-2 w-64" onchange="this.form.submit()">
+                                    <option value="">Todos los Módulos</option>
+                                    @foreach($cursosDisponibles as $c)
+                                        <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>
+                                            {{ $c->modulo->nombre }} - {{ $c->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @endif
                             <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar por nombre o DNI..." class="w-64 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300">
                                 Buscar
@@ -88,7 +99,7 @@
             <form method="POST" action="{{ route('alumnos.store') }}">
                 @csrf
 
-                @include('alumnos.partials.form', ['alumno' => null])
+                @include('alumnos.partials.form', ['alumno' => null, 'cursos' => $cursos])
 
                 <div class="mt-8 flex justify-end">
                     <button type="button" x-on:click="$dispatch('close')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition duration-300 mr-2 mb-6">
