@@ -15,7 +15,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-bold">Listado de Alumnos</h3>
                         
-                        <!-- Buscador -->
+                        <!-- Buscador y Filtros -->
                         <form method="GET" action="{{ route('alumnos.index') }}" class="flex" x-data="{ 
                             search: '{{ request('search') }}',
                             async performSearch() {
@@ -60,6 +60,7 @@
                         </button>
                     </div>
 
+                    <!-- Tabla Alumnos -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -87,7 +88,7 @@
         </div>
     </div>
 
-    <!-- Modal para crear alumno -->
+    <!-- Modal crear alumno -->
     <x-modal name="crear-alumno" focusable maxWidth="3xl">
         <div class="p-8">
             <h2 class="text-lg font-medium text-gray-900 mb-4">

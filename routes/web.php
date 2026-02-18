@@ -4,7 +4,6 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\Empresa;
-use App\Models\User;
 use App\Models\CursoAcademico;
 use App\Models\Alumno;
 use App\Models\Convenio;
@@ -14,6 +13,10 @@ use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\CursoAcademicoController;
+use App\Http\Controllers\ProfesorController;
+use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\ConvenioController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     $stats = [
@@ -25,13 +28,9 @@ Route::get('/', function () {
     return view('welcome', compact('stats'));
 })->name('welcome');
 
-use App\Http\Controllers\DashboardController;
-
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
-
-use App\Http\Controllers\ConvenioController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,10 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('convenios', ConvenioController::class)->middleware('can:access-management');
     Route::post('/cursos/{id}/importar-alumnos', [CursoAcademicoController::class, 'importarAlumnos'])->name('cursos.importarAlumnos')->middleware('can:access-management');
     Route::get('/cursos/{id}/exportar-pdf', [CursoAcademicoController::class, 'exportarPdf'])->name('cursos.exportarPdf')->middleware('can:access-management');
-    Route::resource('modulos', \App\Http\Controllers\ModuloController::class)->middleware('can:access-management');
-    Route::resource('profesores', \App\Http\Controllers\ProfesorController::class)->middleware('can:admin');
-    Route::get('/configuracion', [\App\Http\Controllers\ConfiguracionController::class, 'index'])->name('configuracion.index');
-    Route::post('/configuracion', [\App\Http\Controllers\ConfiguracionController::class, 'update'])->name('configuracion.update');
+    Route::resource('modulos', ModuloController::class)->middleware('can:access-management');
+    Route::resource('profesores', ProfesorController::class)->middleware('can:admin');
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+    Route::post('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 });
 
 require __DIR__ . '/auth.php';
