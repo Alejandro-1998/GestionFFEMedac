@@ -70,7 +70,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 0;
         }
         th, td {
             border: 1px solid #003366;
@@ -137,7 +137,7 @@
         <tbody>
             @forelse($alumnos as $alumno)
                 <tr>
-                    <td style="text-align: left; padding-left: 15px;">{{ $alumno->nombre_completo }}</td>
+                    <td style="text-align: center;">{{ $alumno->nombre_completo }}</td>
                     <td>{{ $alumno->empresa ? $alumno->empresa->nombre : '-' }}</td>
                     <td>{{ $alumno->dni_encriptado }}</td>
                 </tr>

@@ -127,7 +127,7 @@ class CursoAcademicoController extends Controller
         $cursoAcademico = CursoAcademico::findOrFail($id);
 
         try {
-            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($id), $request->file('fichero_alumnos'));
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($id, null), $request->file('fichero_alumnos'));
             return redirect()->back()->with('success', 'Alumnos importados correctamente.');
         } catch (\Exception $e) {
             Log::error('Error importando alumnos: ' . $e->getMessage());

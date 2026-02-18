@@ -28,7 +28,7 @@
                             {{ __('Módulos') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.*')">
+                        <x-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.index', 'alumnos.create', 'alumnos.edit', 'alumnos.show')">
                             {{ __('Alumnos') }}
                         </x-nav-link>
 

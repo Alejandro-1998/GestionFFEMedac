@@ -25,13 +25,13 @@ class AlumnoController extends Controller
         // Assuming Admin for now or need to traverse User -> Curso -> Alumno
         /** @var \App\Models\User $user */
         $user = \Illuminate\Support\Facades\Auth::user();
-        
+
         // Search
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('nombre_completo', 'like', "%{$search}%")
-                  ->orWhere('dni', 'like', "%{$search}%");
+                    ->orWhere('dni', 'like', "%{$search}%");
             });
         }
 
@@ -39,15 +39,15 @@ class AlumnoController extends Controller
 
         // Filter by Academic Year (via nested relationship)
         if ($request->filled('curso_academico_id')) {
-             $query->where('curso_academico_id', $request->curso_academico_id);
+            $query->where('curso_academico_id', $request->curso_academico_id);
 
-             // Fetch available modules/courses for this academic year
-             $cursosDisponibles = Curso::whereHas('modulo.cursosAcademicos', function($q) use ($request) {
-                 $q->where('curso_academico_modulo.curso_academico_id', $request->curso_academico_id);
-             })->with('modulo')->get();
+            // Fetch available modules/courses for this academic year
+            $cursosDisponibles = Curso::whereHas('modulo.cursosAcademicos', function ($q) use ($request) {
+                $q->where('curso_academico_modulo.curso_academico_id', $request->curso_academico_id);
+            })->with('modulo')->get();
         } else {
-             // If no academic year selected, show all courses
-             $cursosDisponibles = Curso::with('modulo')->get();
+            // If no academic year selected, show all courses
+            $cursosDisponibles = Curso::with('modulo')->get();
         }
 
         // Filter by specific Module/Course
@@ -56,9 +56,9 @@ class AlumnoController extends Controller
         }
 
         $cursos = CursoAcademico::with(['modulos.cursos'])->get(); // For the creation form dropdowns
-        
+
         $alumnos = $query->paginate(10)->withQueryString();
-        
+
         if ($request->ajax()) {
             return view('alumnos.partials.table-rows', compact('alumnos', 'cursos', 'cursosDisponibles'));
         }
@@ -85,12 +85,12 @@ class AlumnoController extends Controller
         // Actually, let's auto-generate to be safe if it's a common pattern, 
         // OR just ensure uniqueness by appending count. 
         // Let's assume we take the provided email or generate from name, then ensure uniqueness.
-        
+
         $baseEmail = $input['email'] ?? null;
         if (!$baseEmail && isset($input['nombre_completo'])) {
             // Generate from name: juan.perez
-             $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
-             $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
+            $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
+            $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
         }
 
         // Clean base email
@@ -155,31 +155,31 @@ class AlumnoController extends Controller
         // Unique Email Logic for Update
         // If email is empty, generate it. If provided, sanitise/uniquify it ONLY if it changed or if user wants us to correct it.
         // Actually, for update, we should trust the user input mainly, but apply unique check logic if they changed it.
-        
+
         $baseEmail = $input['email'] ?? null;
         $currentAlumno = Alumno::find($id);
-        
+
         // Only regenerate if email field is being updated and it is different or empty
         if ((!$baseEmail && $currentAlumno) || ($baseEmail && $currentAlumno && $baseEmail !== $currentAlumno->email)) {
-             if (!$baseEmail && isset($input['nombre_completo'])) {
-                 $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
-                 $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
-             }
-             
-             // Clean base email
-             $baseEmail = str_replace('@alu.medac.es', '', $baseEmail);
-             $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
+            if (!$baseEmail && isset($input['nombre_completo'])) {
+                $parts = explode(' ', strtolower($this->removeAccents($input['nombre_completo'])));
+                $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
+            }
 
-             // Ensure uniqueness (accounting for self)
-             $email = $baseEmail . '@alu.medac.es';
-             $counter = 1;
-             while (Alumno::where('email', $email)->where('id', '!=', $id)->exists()) {
-                 $email = $baseEmail . $counter . '@alu.medac.es';
-                 $counter++;
-             }
-             $input['email'] = $email;
+            // Clean base email
+            $baseEmail = str_replace('@alu.medac.es', '', $baseEmail);
+            $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
+
+            // Ensure uniqueness (accounting for self)
+            $email = $baseEmail . '@alu.medac.es';
+            $counter = 1;
+            while (Alumno::where('email', $email)->where('id', '!=', $id)->exists()) {
+                $email = $baseEmail . $counter . '@alu.medac.es';
+                $counter++;
+            }
+            $input['email'] = $email;
         } elseif ($baseEmail && !str_ends_with($baseEmail, '@alu.medac.es')) {
-             $input['email'] = $baseEmail . '@alu.medac.es';
+            $input['email'] = $baseEmail . '@alu.medac.es';
         }
 
         $request->merge($input);
@@ -226,7 +226,11 @@ class AlumnoController extends Controller
             ->where('curso_academico_id', $currentYearId)
             ->with(['empresa', 'curso']) // Eager load
             ->get()
-            ->sortBy('nombre_completo'); // Sorting by name since it's a single string
+            ->sortBy(function ($alumno) {
+                // Sort by surname (everything after the first space)
+                $parts = explode(' ', $alumno->nombre_completo, 2);
+                return isset($parts[1]) ? $parts[1] : $parts[0];
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
         return view('alumnos.listado_curso', compact('alumnos', 'curso', 'cursoAcademico'));
     }
@@ -237,7 +241,10 @@ class AlumnoController extends Controller
             ->where('curso_academico_id', $cursoAcademico->id)
             ->with(['empresa', 'curso'])
             ->get()
-            ->sortBy('nombre_completo');
+            ->sortBy(function ($alumno) {
+                $parts = explode(' ', $alumno->nombre_completo, 2);
+                return isset($parts[1]) ? $parts[1] : $parts[0];
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
         return view('alumnos.listado_curso', compact('alumnos', 'curso', 'cursoAcademico'));
     }
@@ -248,21 +255,49 @@ class AlumnoController extends Controller
             ->where('curso_academico_id', $cursoAcademico->id)
             ->with(['empresa', 'curso'])
             ->get()
-            ->sortBy('nombre_completo');
+            ->sortBy(function ($alumno) {
+                $parts = explode(' ', $alumno->nombre_completo, 2);
+                return isset($parts[1]) ? $parts[1] : $parts[0];
+            }, SORT_NATURAL | SORT_FLAG_CASE);
 
         // Use a landscape view or standard portrait depending on data. 
         // Portrait usually fits 3 columns fine.
         $pdf = Pdf::loadView('cursos.pdf_alumnos', compact('alumnos', 'curso', 'cursoAcademico'));
-        
+
         // Return stream or download
         return $pdf->download('Listado_Alumnos_' . $curso->nombre . '_' . $cursoAcademico->anyo . '.pdf');
     }
 
-    private function removeAccents($string) {
+    public function importarAlumnos(Request $request, Curso $curso, CursoAcademico $cursoAcademico)
+    {
+        $request->validate([
+            'fichero_alumnos' => 'required|file|mimes:csv,txt,xlsx,xls',
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($cursoAcademico->id, $curso->id), $request->file('fichero_alumnos'));
+            return redirect()->back()->with('success', 'Alumnos importados correctamente al curso ' . $curso->nombre);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error importando alumnos: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al importar alumnos: ' . $e->getMessage());
+        }
+    }
+
+    private function removeAccents($string)
+    {
         $accents = [
-            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
-            'Á' => 'A', 'É' => 'E', 'Í' => 'I', 'Ó' => 'O', 'Ú' => 'U',
-            'ñ' => 'n', 'Ñ' => 'N'
+            'á' => 'a',
+            'é' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ú' => 'u',
+            'Á' => 'A',
+            'É' => 'E',
+            'Í' => 'I',
+            'Ó' => 'O',
+            'Ú' => 'U',
+            'ñ' => 'n',
+            'Ñ' => 'N'
         ];
         return strtr($string, $accents);
     }

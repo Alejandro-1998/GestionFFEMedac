@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\Log;
 class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
 {
     private $cursoAcademicoId;
+    private $cursoId;
 
-    public function __construct($cursoAcademicoId)
+    public function __construct($cursoAcademicoId, $cursoId = null)
     {
         $this->cursoAcademicoId = $cursoAcademicoId;
+        $this->cursoId = $cursoId;
     }
 
     /**
@@ -30,7 +32,7 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
     public function getCsvSettings(): array
     {
         return [
-            'input_encoding' => 'UTF-8',
+            'input_encoding' => 'ISO-8859-1',
             'delimiter' => ';',
         ];
     }
@@ -55,12 +57,18 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
                  }
             }
 
-            // Ensure we have enough columns for DNI (index 1)
-            if (!isset($row[1]) || empty($row[1])) {
+            // Ensure Name is present (Index 0)
+            if (!isset($row[0]) || empty(trim($row[0]))) {
+                Log::warning("Row #{$index} skipped: Name missing.");
+                continue;
+            }
+            $nombreCompleto = trim($row[0]);
+
+            // Ensure DNI is present (Index 1)
+            if (!isset($row[1]) || empty(trim($row[1]))) {
                 Log::warning("Row #{$index} skipped: DNI missing.");
                 continue;
             }
-
             $dni = trim($row[1]);
 
             // Skip duplicates
@@ -81,37 +89,35 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
                 }
             }
 
-            // Nota Media (Index 10) - Ignored, auto-calculated
-            // $notaMedia = null;
-            // if (isset($row[10])) { ... }
-
             // DNI Encriptado Logic
-            $dniEncriptado = $dni;
+            $dniEncriptado = $dni; // Default to DNI
             if (strlen($dni) >= 9) {
                 $dniEncriptado = substr($dni, 0, 2) . '**' . substr($dni, 4, 2) . '**' . substr($dni, 8);
             }
 
             // Email Generation
             $email = null;
-            if (isset($row[0])) { // nombre_completo
-                 $parts = explode(' ', strtolower($this->removeAccents($row[0])));
+            $parts = explode(' ', strtolower($this->removeAccents($nombreCompleto)));
+            if (count($parts) > 0) {
                  $baseEmail = $parts[0] . (isset($parts[1]) ? '.' . $parts[1] : '');
-                 
-                 // Clean base email
                  $baseEmail = preg_replace('/[^a-z0-9\.]/', '', $baseEmail);
-
-                 // Ensure uniqueness
                  $email = $baseEmail . '@alu.medac.es';
+                 
                  $counter = 1;
                  while (Alumno::where('email', $email)->exists()) {
                      $email = $baseEmail . $counter . '@alu.medac.es';
                      $counter++;
                  }
             }
+            
+            if (!$email) {
+                 Log::warning("Row #{$index} skipped: Could not generate email for '$nombreCompleto'.");
+                 continue;
+            }
 
             try {
                 Alumno::create([
-                    'nombre_completo'    => $row[0] ?? null,
+                    'nombre_completo'    => $nombreCompleto,
                     'dni'                => $dni,
                     'dni_encriptado'     => $dniEncriptado,
                     'email'              => $email,
@@ -123,9 +129,9 @@ class AlumnosImport implements ToCollection, WithStartRow, WithCustomCsvSettings
                     'nota_6'             => $this->parseGrade($row[7] ?? null),
                     'nota_7'             => $this->parseGrade($row[8] ?? null),
                     'nota_8'             => $this->parseGrade($row[9] ?? null),
-                    // 'nota_media'       => calculado en el modelo
                     'empresa_id'         => $empresaId,
                     'curso_academico_id' => $this->cursoAcademicoId,
+                    'curso_id'           => $this->cursoId,
                 ]);
                 Log::info("Row #{$index}: Student '$dni' created successfully.");
             } catch (\Exception $e) {

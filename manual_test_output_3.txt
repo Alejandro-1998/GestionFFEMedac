@@ -1,0 +1,22 @@
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[HY000]: General error: 1364 Field 'nif' doesn't have a default value (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: gestor_practicas_ffe, SQL: insert into `empresas` (`nombre`, `direccion`, `telefono`, `updated_at`, `created_at`) values (Test Corp, Test Dir, 123456789, 2026-02-18 21:06:37, 2026-02-18 21:06:37))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+    834▕             $exceptionType = $this->isUniqueConstraintError($e)
+    835▕                 ? UniqueConstraintViolationException::class
+    836▕                 : QueryException::class;
+    837▕ 
+  ➜ 838▕             throw new $exceptionType(
+    839▕                 $this->getNameWithReadWriteType(),
+    840▕                 $query,
+    841▕                 $this->prepareBindings($bindings),
+    842▕                 $e,
+
+  1   vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:53
+      PDOException::("SQLSTATE[HY000]: General error: 1364 Field 'nif' doesn't have a default value")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\MySqlConnection.php:53
+      PDOStatement::execute()
+
