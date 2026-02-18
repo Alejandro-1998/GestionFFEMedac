@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use \Illuminate\Validation\Rules\Password;
-use \Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Curso;
 use App\Models\CursoAcademico;
 use App\Models\Alumno;
@@ -18,15 +16,9 @@ class AlumnoController extends Controller
      */
     public function index(Request $request)
     {
-        // Eager load curso (and its module -> years) and the direct cursoAcademico
         $query = Alumno::with(['empresa', 'curso.modulo', 'cursoAcademico']);
+        $user = Auth::user();
 
-        // Filter by professor's courses not directly implemented yet in new schema for brevity
-        // Assuming Admin for now or need to traverse User -> Curso -> Alumno
-        /** @var \App\Models\User $user */
-        $user = \Illuminate\Support\Facades\Auth::user();
-
-        // Search
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
