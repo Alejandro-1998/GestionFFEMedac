@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\CursoAcademico;
 use App\Models\Modulo;
 use App\Models\Curso;
@@ -11,7 +10,6 @@ use App\Models\Empresa;
 use App\Models\Sede;
 use App\Models\Empleado;
 use App\Models\Convenio;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -23,20 +21,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Users
-        $admin = User::factory()->create([
-            'nombre' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('password'),
-            'rol' => 'admin',
-        ]);
-
-        $profesor = User::factory()->create([
-            'nombre' => 'Profesor',
-            'email' => 'profesor@profesor.com',
-            'password' => Hash::make('12345678'),
-            'rol' => 'profesor',
-        ]);
+        $this->call(UserSeeder::class);
 
         // 2. Create Academic Years (Cursos Academicos)
         $year2425 = CursoAcademico::create(['anyo' => '2024-2025']);
@@ -119,23 +104,23 @@ class DatabaseSeeder extends Seeder
             'activo' => true,
         ]);
         
-        // 9. Create example Convenio (optional, requiring a student from 2º DAW)
-        $student = Alumno::where('curso_id', $curso2DAW->id)->first();
-        if ($student) {
-             Convenio::create([
-                'alumno_id' => $student->id,
-                'profesor_id' => $profesor->id,
-                'empresa_id' => $empresa1->id,
-                'empleado_id' => $empleado1->id, // Tutor laboral
-                'curso_academico_id' => $year2425->id, // Keep this for easier checking? Or link via cycle
-                // Note: Convenio model might still link to year directly or via student->curso->modulo->year. 
-                // Ensuring Convenio migration wasn't dropped, just need to make sure IDs exist.
-                'sede_id' => $sede1->id,
-                'total_horas' => 370,
-                'fecha_inicio' => Carbon::now()->addDays(1),
-                'fecha_fin' => Carbon::now()->addMonths(3),
-                'estado' => 'en_proceso',
-            ]);
-        }
+        // // 9. Create example Convenio (optional, requiring a student from 2º DAW)
+        // $student = Alumno::where('curso_id', $curso2DAW->id)->first();
+        // if ($student) {
+        //      Convenio::create([
+        //         'alumno_id' => $student->id,
+        //         'profesor_id' => $profesor->id,
+        //         'empresa_id' => $empresa1->id,
+        //         'empleado_id' => $empleado1->id, // Tutor laboral
+        //         'curso_academico_id' => $year2425->id, // Keep this for easier checking? Or link via cycle
+        //         // Note: Convenio model might still link to year directly or via student->curso->modulo->year. 
+        //         // Ensuring Convenio migration wasn't dropped, just need to make sure IDs exist.
+        //         'sede_id' => $sede1->id,
+        //         'total_horas' => 370,
+        //         'fecha_inicio' => Carbon::now()->addDays(1),
+        //         'fecha_fin' => Carbon::now()->addMonths(3),
+        //         'estado' => 'en_proceso',
+        //     ]);
+        // }
     }
 }
