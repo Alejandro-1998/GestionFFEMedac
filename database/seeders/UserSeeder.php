@@ -28,12 +28,12 @@ class UserSeeder extends Seeder
             'rol' => 'profesor',
         ]);
 
-        // Asociar al profesor a los cursos de DAW
-        $cursosDaw = CursoAcademico::whereHas('ciclo', function ($query) {
-            
-            $query->where('nombre', 'DAW');
-        })->get();
+        // // Asociar al profesor a los cursos de DAW
+        // $cursosDaw = CursoAcademico::whereHas('ciclo', function ($query) {
 
-        $profesor->cursos()->attach($cursosDaw);
+        //     $query->where('nombre', 'DAW');
+        // })->get();
+
+        // $profesor->cursos()->attach($cursosDaw);
     }
 }
