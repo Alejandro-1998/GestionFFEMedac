@@ -11,22 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Create Modulos table
+        // Modulos
         Schema::create('modulos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre'); // e.g., DAW, Marketing
+            $table->string('nombre');
             $table->timestamps();
         });
 
-        // 2. Create Cursos table (Groups: 1º, 2º, etc.)
+        // Cursos
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre'); // 1º, 2º
+            $table->string('nombre');
             $table->foreignId('modulo_id')->constrained('modulos')->onDelete('cascade');
             $table->timestamps();
         });
 
-        // 3. Create pivot table for Companies and Modulos
+        // Pivot
         Schema::create('empresa_modulo', function (Blueprint $table) {
             $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');
             $table->foreignId('modulo_id')->constrained('modulos')->onDelete('cascade');

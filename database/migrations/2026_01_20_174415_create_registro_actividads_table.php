@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('registros_actividad', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
-            $table->nullableMorphs('sujeto'); // sujeto_type and sujeto_id
-            $table->string('evento'); // created, updated, deleted
+            $table->nullableMorphs('sujeto');
+            $table->string('evento');
             $table->timestamps();
         });
     }
