@@ -6,7 +6,7 @@
         <meta name="author" content="Alejandro Caballero Luque">
         <title>Gestión FFE | Davante</title>
 
-        <!-- Fonts -->
+        <!-- Fuentes -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <link href="https://fonts.bunny.net/css?family=outfit:400,600,700,800&display=swap" rel="stylesheet" />
@@ -16,14 +16,14 @@
     </head>
     <body class="antialiased bg-surface-50 text-surface-800 selection:bg-primary-600 selection:text-white">
         
-        <!-- Background Gradients (Subtle Light) -->
+        <!-- Background -->
         <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
             <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-100/40 rounded-full blur-3xl opacity-60 mix-blend-multiply"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/40 rounded-full blur-3xl opacity-60 mix-blend-multiply"></div>
         </div>
 
         <div class="relative z-10 flex flex-col min-h-screen">
-            <!-- Navigation -->
+            <!-- Navegación -->
             <nav class="w-full py-6 px-6 lg:px-12 flex justify-between items-center backdrop-blur-md bg-white/70 border-b border-surface-200 sticky top-0 z-50 shadow-sm">
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('images/davante.png') }}" alt="Davante" class="h-12 w-auto">
@@ -41,7 +41,7 @@
                 </div>
             </nav>
 
-            <!-- Hero Section -->
+            <!-- Hero -->
             <main class="flex-grow flex items-center justify-center relative px-6 py-12">
                 <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     
@@ -64,9 +64,9 @@
                         </div>
                     </div>
 
-                    <!-- Stats Cards (Grid) -->
+                    <!-- Tarjetas Datos -->
                     <div class="grid grid-cols-2 gap-4 lg:gap-6 relative">
-                        <!-- Card 1 -->
+                        <!-- Tarjeta 1 -->
                         <div class="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-surface-200 shadow-lg shadow-surface-200/50 hover:border-primary-200 transition-all group hover:bg-white">
                             <div class="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -75,7 +75,7 @@
                             <div class="text-surface-500 font-medium">Empresas Colaboradoras</div>
                         </div>
 
-                        <!-- Card 2 -->
+                        <!-- Tarjeta 2 -->
                         <div class="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-surface-200 shadow-lg shadow-surface-200/50 hover:border-primary-200 transition-all group hover:bg-white mt-8">
                             <div class="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -84,7 +84,7 @@
                             <div class="text-surface-500 font-medium">Alumnos Activos</div>
                         </div>
 
-                         <!-- Card 3 -->
+                         <!-- Tarjeta 3 -->
                         <div class="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-surface-200 shadow-lg shadow-surface-200/50 hover:border-primary-200 transition-all group hover:bg-white -mt-8">
                             <div class="w-12 h-12 rounded-lg bg-primary-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -93,7 +93,7 @@
                             <div class="text-surface-500 font-medium">Cursos Académicos</div>
                         </div>
 
-                        <!-- Card 4 - Convenios -->
+                        <!-- Tarjeta 4 -->
                         <div class="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-surface-200 shadow-lg shadow-surface-200/50 hover:border-primary-200 transition-all group hover:bg-white">
                             <div class="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>

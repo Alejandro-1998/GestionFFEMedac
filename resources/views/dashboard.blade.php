@@ -13,9 +13,9 @@
             
 
 
-            <!-- Stats Grid -->
+            <!-- Tarjetas Datos -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Alumnos Card -->
+                <!-- Alumnos Tarjeta -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 border-l-4 border-indigo-500">
                     <div class="flex items-center">
                         <div class="p-2 rounded-full bg-indigo-100 text-indigo-500 mr-3">
@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <!-- Empresas Card -->
+                <!-- Empresas Tarjeta -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 border-l-4 border-blue-500">
                     <div class="flex items-center">
                         <div class="p-2 rounded-full bg-blue-100 text-blue-500 mr-3">
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <!-- Sedes Card -->
+                <!-- Sedes Tarjeta -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 border-l-4 border-green-500">
                     <div class="flex items-center">
                         <div class="p-2 rounded-full bg-green-100 text-green-500 mr-3">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
 
-                <!-- Empleados Card -->
+                <!-- Empleados Tarjeta -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-4 border-l-4 border-orange-500">
                     <div class="flex items-center">
                         <div class="p-2 rounded-full bg-orange-100 text-orange-500 mr-3">
@@ -112,7 +112,7 @@
                     </div>
                 </div>
 
-                <!-- Actividad Reciente (Últimos Alumnos) -->
+                <!-- Actividad Reciente -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <h4 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
