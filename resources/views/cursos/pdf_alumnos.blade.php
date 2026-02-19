@@ -7,11 +7,13 @@
         @page {
             margin: 100px 50px;
         }
+
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #333;
             font-size: 12px;
         }
+
         .header {
             position: fixed;
             top: -60px;
@@ -21,9 +23,11 @@
             width: 100%;
             display: table; /* Simulate flexbox */
         }
+
         .header-content {
             display: table-row;
         }
+
         .logo-text {
             display: table-cell;
             vertical-align: middle;
@@ -33,12 +37,14 @@
             font-weight: bold;
             color: #003366; /* Dark Blue */
         }
+
         .logo-img {
             display: table-cell;
             vertical-align: middle;
             text-align: right;
             width: 50%;
         }
+
         .logo-img img {
             height: 40px;
         }
@@ -48,18 +54,21 @@
             margin-top: 20px;
             margin-bottom: 30px;
         }
+
         .main-title {
             font-size: 20px;
             font-weight: bold;
             color: #003366;
             margin-bottom: 10px;
         }
+
         .sub-title {
             font-size: 14px;
             font-weight: bold;
             color: #003366;
             text-transform: uppercase;
         }
+
         .academic-year {
             font-size: 16px;
             font-weight: bold;
@@ -72,11 +81,13 @@
             border-collapse: collapse;
             margin-top: 0;
         }
+
         th, td {
             border: 1px solid #003366;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #e6f3ff; /* Light Blue */
             color: #003366;
@@ -84,21 +95,28 @@
             text-align: center;
             text-transform: uppercase;
         }
+
         td {
             text-align: center;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+
         .course-header {
             background-color: #e6f3ff;
             color: #003366;
             font-weight: bold;
             text-align: center;
             padding: 10px;
-            border: 1px solid #003366;
-            border-bottom: none;
+            /* Border handled by th/td rules, but we can ensure specific styling */
+            border: 1px solid #003366; 
             text-transform: uppercase;
+        }
+        
+        .table-wrapper {
+            width: 70%;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -121,32 +139,30 @@
         <div class="academic-year">Curso {{ $cursoAcademico->anyo }}</div>
     </div>
 
-    <!-- Course Header Row Simulated as a separate div/table -->
-    <div style="border: 1px solid #003366; border-bottom: none; background-color: #e6f3ff; color: #003366; font-weight: bold; text-align: center; padding: 10px; text-transform: uppercase;">
-        {{ $curso->nombre }} - {{ $curso->modulo->nombre }}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" class="course-header">{{ $curso->nombre }} - {{ $curso->modulo->nombre }}</th>
+                </tr>
+                <tr>
+                    <th>DNI</th>
+                    <th>EMPRESA ASIGNADA</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($alumnos as $alumno)
+                    <tr>
+                        <td style="text-align: center;">{{ $alumno->dni_encriptado }}</td>
+                        <td style="text-align: center;">{{ $alumno->empresa ? $alumno->empresa->nombre : '-' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 20px;">No hay alumnos matriculados.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ALUMNO</th>
-                <th>EMPRESA ASIGNADA</th>
-                <th>DNI</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($alumnos as $alumno)
-                <tr>
-                    <td style="text-align: center;">{{ $alumno->nombre_completo }}</td>
-                    <td>{{ $alumno->empresa ? $alumno->empresa->nombre : '-' }}</td>
-                    <td>{{ $alumno->dni_encriptado }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="3" style="text-align: center; padding: 20px;">No hay alumnos matriculados.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
 </body>
 </html>
