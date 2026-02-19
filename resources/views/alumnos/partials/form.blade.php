@@ -24,7 +24,7 @@
         @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
     </div>
 
-    <!-- Selección de Curso Académico / Módulo / Curso (Solo para creación) -->
+    <!-- Selección de Curso Académico / Módulo / Curso -->
     @if(!$alumno)
     <div x-data="{
         cursosAcademicos: {{ $cursos->toJson() }},
@@ -60,7 +60,7 @@
         
         <h4 class="text-sm font-medium text-gray-900 border-b pb-2 mb-3">Datos Académicos</h4>
 
-        <!-- 1. Curso Académico -->
+        <!-- Curso Académico -->
         <div>
             <label for="select_anyo" class="block text-sm font-medium text-gray-700">Curso Académico</label>
             <select name="curso_academico_id" x-model="selectedAnyo" id="select_anyo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -71,7 +71,7 @@
             </select>
         </div>
 
-        <!-- 2. Módulo (Ciclo) -->
+        <!-- Módulo (Ciclo) -->
         <div>
             <label for="select_modulo" class="block text-sm font-medium text-gray-700">Módulo (Ciclo)</label>
             <select x-model="selectedModulo" id="select_modulo" :disabled="!selectedAnyo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400">
@@ -82,7 +82,7 @@
             </select>
         </div>
 
-        <!-- 3. Curso (1º/2º) -->
+        <!-- Curso (1º/2º) -->
         <div>
             <label for="curso_id" class="block text-sm font-medium text-gray-700">Año del Curso (1º / 2º)</label>
             <select name="curso_id" id="curso_id" x-model="selectedCurso" :disabled="!selectedModulo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400" required>
@@ -95,7 +95,7 @@
         </div>
     </div>
     @else
-        <!-- Mostrar datos académicos como solo lectura -->
+        <!-- Mostrar datos académicos -->
         <div class="mt-4 bg-gray-50 p-4 rounded-md border border-gray-200">
             <h4 class="text-sm font-medium text-gray-900 border-b pb-2 mb-3">Datos Académicos</h4>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -112,15 +112,8 @@
                    <span class="text-gray-800">{{ $alumno->curso ? $alumno->curso->nombre : '-' }}</span>
                 </div>
             </div>
-            <!-- Hidden inputs to prevent validation errors if fields are required, though controller updates ignore missing. -->
-            <!-- Actually, if validation requires curso_id, we might need hidden inputs. Checking controller... nullable for update. So fine. -->
         </div>
     @endif
-
-
-
-    <!-- Nota Media -->
-
 
     <!-- Calificaciones -->
     <div class="mt-6 border-t pt-4">

@@ -23,7 +23,7 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $alumno->created_at->format('d/m/Y') }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <!-- Botón Editar con Modal -->
+            
             <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'editar-alumno-{{ $alumno->id }}')" class="text-indigo-600 hover:text-indigo-900 mr-2">
                 Editar
             </button>
@@ -36,7 +36,7 @@
                 </button>
             </form>
 
-            <!-- Modal Editar (Uno por alumno) -->
+            <!-- Modal Editar -->
             <x-modal name="editar-alumno-{{ $alumno->id }}" focusable maxWidth="3xl">
                 <div class="p-8">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">
