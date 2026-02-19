@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Curso;
 use App\Models\CursoAcademico;
 use App\Models\Alumno;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AlumnosImport;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class AlumnoController extends Controller
 {
@@ -83,12 +86,12 @@ class AlumnoController extends Controller
         $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
 
         $email = $baseEmail . '@alu.medac.es';
-        $counter = 1;
+        $contador = 1;
 
         while (Alumno::where('email', $email)->exists()) {
 
-            $email = $baseEmail . $counter . '@alu.medac.es';
-            $counter++;
+            $email = $baseEmail . $contador . '@alu.medac.es';
+            $contador++;
         }
 
         $email =$input['email'];
@@ -155,12 +158,12 @@ class AlumnoController extends Controller
             $baseEmail = preg_replace('/[^a-z0-9\.]/', '', strtolower($baseEmail));
 
             $email = $baseEmail . '@alu.medac.es';
-            $counter = 1;
+            $contador = 1;
 
             while (Alumno::where('email', $email)->where('id', '!=', $id)->exists()) {
 
-                $email = $baseEmail . $counter . '@alu.medac.es';
-                $counter++;
+                $email = $baseEmail . $contador . '@alu.medac.es';
+                $contador++;
             }
 
             $input['email'] = $email;
@@ -208,11 +211,11 @@ class AlumnoController extends Controller
 
     public function listadoCursoActual(Curso $curso)
     {
-        $currentYearId = CursoAcademico::where('actual', true)->value('id');
-        $cursoAcademico = CursoAcademico::find($currentYearId);
+        $idAnyoActual = CursoAcademico::where('actual', true)->value('id');
+        $cursoAcademico = CursoAcademico::find($idAnyoActual);
 
         $alumnos = Alumno::where('curso_id', $curso->id)
-            ->where('curso_academico_id', $currentYearId)
+            ->where('curso_academico_id', $idAnyoActual)
             ->with(['empresa', 'curso'])
             ->get()
             ->sortBy(function ($alumno) {
@@ -248,11 +251,8 @@ class AlumnoController extends Controller
                 return isset($parts[1]) ? $parts[1] : $parts[0];
             }, SORT_NATURAL | SORT_FLAG_CASE);
 
-        // Use a landscape view or standard portrait depending on data. 
-        // Portrait usually fits 3 columns fine.
         $pdf = Pdf::loadView('cursos.pdf_alumnos', compact('alumnos', 'curso', 'cursoAcademico'));
 
-        // Return stream or download
         return $pdf->download('Listado_Alumnos_' . $curso->nombre . '_' . $cursoAcademico->anyo . '.pdf');
     }
 
@@ -263,10 +263,15 @@ class AlumnoController extends Controller
         ]);
 
         try {
-            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\AlumnosImport($cursoAcademico->id, $curso->id), $request->file('fichero_alumnos'));
+
+            Excel::import(new AlumnosImport($cursoAcademico->id, $curso->id), $request->file('fichero_alumnos'));
+
             return redirect()->back()->with('success', 'Alumnos importados correctamente al curso ' . $curso->nombre);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error importando alumnos: ' . $e->getMessage());
+        }
+        catch (Exception $e) {
+
+            Log::error('Error importando alumnos: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'Error al importar alumnos: ' . $e->getMessage());
         }
     }
