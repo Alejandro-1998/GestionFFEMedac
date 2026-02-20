@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 class ProfesorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Vista de todos los profesores
      */
     public function index()
     {
@@ -20,7 +20,7 @@ class ProfesorController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Mostrar cursos
      */
     public function create()
     {
@@ -29,7 +29,7 @@ class ProfesorController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Crear profesor.
      */
     public function store(Request $request)
     {
@@ -56,28 +56,28 @@ class ProfesorController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostrar un profesor
      */
     public function show(string $id)
     {
-        // Not used currently
+        //
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulario de edición
      */
     public function edit(string $id)
     {
         $profesor = User::findOrFail($id);
         $cursos = CursoAcademico::all();
-        // Load the assigned course IDs
+
         $cursosAsignados = $profesor->cursos->pluck('id')->toArray();
         
         return view('profesores.edit', compact('profesor', 'cursos', 'cursosAsignados'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualizar profesor.
      */
     public function update(Request $request, string $id)
     {
@@ -108,7 +108,7 @@ class ProfesorController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar profesor.
      */
     public function destroy(string $id)
     {

@@ -20,9 +20,7 @@ class EmpresaController extends Controller
         $user = Auth::user();
 
         if (!$user->can('admin')) {
-             // Filter for professors (simplified for now, ideally via User -> Curso -> Modulo -> Empresa)
-             // For now, show all or filter if user has relationship logic implemented
-             // Assuming admin for MVP refactor or implementing full logic later
+
         }
 
         if ($request->has('search')) {
@@ -36,7 +34,7 @@ class EmpresaController extends Controller
 
         $empresas = $query->get();
         
-        $modulos = Modulo::all(); // Used for filtering if implemented in view
+        $modulos = Modulo::all();
 
         if ($request->ajax()) {
             return view('empresas.partials.table-rows', compact('empresas', 'modulos'));
@@ -53,7 +51,7 @@ class EmpresaController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
         
-        $modulos = Modulo::all(); // List all modules
+        $modulos = Modulo::all();
 
         return view("empresas.create", compact('modulos'));
     }
@@ -110,8 +108,6 @@ class EmpresaController extends Controller
 
         $empresa->update($validated);
 
-        // Modulos update logic if needed (currently not in requirements to edit them here, but good to have)
-        // If edit form adds modulos field:
         if ($request->has('modulos')) {
              $empresa->modulos()->sync($request->modulos);
         }

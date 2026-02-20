@@ -56,13 +56,6 @@
         <span class="block text-sm font-medium text-gray-700 mb-2">Módulos Asociados <span class="text-red-500">*</span></span>
         
         @if($empresa)
-            <!-- Edit Mode: Read Only (or make editable if desired, but sticking to logic) -->
-            <!-- Actually, usually editable. But controller update logic didn't sync. Let's make it editable if easy, or keep read-only as per previous comment -->
-            <!-- Previous code said "Edit Mode: Read Only". I will keep it read only for now to match controller logic, or update controller to support sync. 
-                 Controller update method (step 318) had commented out sync.
-                 For now, let's keep it consistent: allow editing if I uncommented in controller, but for now just display.
-                 Actually, best to allow editing. I will update controller later if needed. Use same logic as Create for consistency if possible?
-                 No, the previous code had a specific Read Only block. I will stick to that but use Modulos. -->
             <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
                 @if($empresa->modulos->count() > 0)
                     <div class="flex flex-wrap gap-2">

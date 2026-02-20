@@ -52,11 +52,10 @@ class ModuloController extends Controller
             'nombre' => $request->nombre,
         ]);
 
-        // Create associated Cursos based on duration
         $cursosParaCrear = match ($request->duracion) {
             '2_anyos' => ['1º', '2º'],
             '1_anyo' => ['1º'],
-            default => ['1º', '2º'], // Fallback
+            default => ['1º', '2º'],
         };
 
         foreach ($cursosParaCrear as $nombreCurso) {
@@ -91,10 +90,8 @@ class ModuloController extends Controller
             return redirect()->back()->with('error', 'No hay un curso académico activo.');
         }
 
-        // Get module courses (1º, 2º) IDs
         $cursoIds = $modulo->cursos->pluck('id');
 
-        // Fetch students enrolled in these courses AND the active academic year
         $alumnos = \App\Models\Alumno::whereIn('curso_id', $cursoIds)
             ->where('curso_academico_id', $cursoActual->id)
             ->with(['empresa', 'curso'])

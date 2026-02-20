@@ -7,7 +7,7 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
+        <!-- Fuentes -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <link href="https://fonts.bunny.net/css?family=outfit:400,600,700,800&display=swap" rel="stylesheet" />
@@ -19,7 +19,7 @@
     </head>
     <body class="font-sans text-surface-800 antialiased bg-surface-50 selection:bg-primary-600 selection:text-white">
         
-        <!-- Background Gradients -->
+        <!-- Background -->
         <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
              <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-100/30 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-100/30 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>

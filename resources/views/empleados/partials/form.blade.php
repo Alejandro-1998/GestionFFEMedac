@@ -61,7 +61,6 @@
                     </option>
                 @endforeach
 
-                {{-- Handle case where assigned Sede is not in the company list (Data Inconsistency) --}}
                 @php
                     $currentSedeId = old('sede_id', $empleado?->sede_id);
                     $isInList = $sedes->contains('id', $currentSedeId);

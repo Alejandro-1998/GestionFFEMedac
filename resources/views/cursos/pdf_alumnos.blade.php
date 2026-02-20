@@ -21,7 +21,7 @@
             right: 0;
             height: 100px;
             width: 100%;
-            display: table; /* Simulate flexbox */
+            display: table;
         }
 
         .header-content {
@@ -35,7 +35,7 @@
             width: 50%;
             font-size: 24px;
             font-weight: bold;
-            color: #003366; /* Dark Blue */
+            color: #003366;
         }
 
         .logo-img {
@@ -89,7 +89,7 @@
         }
 
         th {
-            background-color: #e6f3ff; /* Light Blue */
+            background-color: #e6f3ff;
             color: #003366;
             font-weight: bold;
             text-align: center;
@@ -109,7 +109,6 @@
             font-weight: bold;
             text-align: center;
             padding: 10px;
-            /* Border handled by th/td rules, but we can ensure specific styling */
             border: 1px solid #003366; 
             text-transform: uppercase;
         }

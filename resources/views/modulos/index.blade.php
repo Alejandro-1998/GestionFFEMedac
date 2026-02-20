@@ -15,7 +15,7 @@
                     Nuevo Módulo
                 </button>
             </div>
-            <!-- Messages -->
+            <!-- Mensajes -->
             @if (session('success'))
                 <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
                     <span class="block sm:inline">{{ session('success') }}</span>
@@ -44,9 +44,6 @@
                                 
                                 <div class="space-y-3">
                                     @php
-                                        // $currentYearId is used in other places? If not needed for the link, I can remove it if it was only for the old link.
-                                        // But I need to count students. The count logic: $curso->alumnos->where('curso_academico_id', $currentYearId)->count()
-                                        // So I keep $currentYearId logic.
                                         $currentYearId = \App\Models\CursoAcademico::where('actual', true)->value('id');
                                     @endphp
                                     @foreach($modulo->cursos as $curso)

@@ -37,7 +37,7 @@ class ConvenioController extends Controller
         }
 
         $convenios = $query->paginate(10);
-        $cursos = CursoAcademico::all(); // For the filter dropdown
+        $cursos = CursoAcademico::all();
         
         return view('convenios.index', compact('convenios', 'cursos'));
     }
@@ -51,18 +51,15 @@ class ConvenioController extends Controller
         return view('convenios.show', compact('convenio'));
     }
     /**
-     * Show the form for creating a new resource.
+     * Formulario de creación.
      */
     public function create()
     {
-        // Fetch Alumnos with their related Curso (implicit if loaded or just use all)
         /** @var \App\Models\User $user */
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user && $user->rol === 'profesor') {
-            // Get years assigned to professor
             $cursoIds = $user->cursos()->pluck('cursos_academicos.id');
-            
-            // Get students in those years via nested relationship
+
             $alumnos = \App\Models\Alumno::whereHas('curso.modulo', function($q) use ($cursoIds) {
                             $q->whereIn('curso_academico_id', $cursoIds);
                         })
@@ -81,7 +78,7 @@ class ConvenioController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Crear Convenio
      */
     public function store(Request $request)
     {
@@ -108,31 +105,25 @@ class ConvenioController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulario de edición.
      */
     public function edit($id)
     {
         $convenio = Convenio::with(['alumno', 'empresa.sedes', 'empresa.empleados'])->findOrFail($id);
         $profesores = User::where('rol', 'profesor')->get(); 
-        
-        // Ensure we have the available options for the selected company
-        // $empresa = $convenio->empresa; // Already loaded
 
         return view('convenios.edit', compact('convenio', 'profesores'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualización de Convenio.
      */
     public function update(Request $request, $id)
     {
         $request->validate([
-            // 'alumno_id' => 'required|exists:users,id', // Should not change usually
-            // 'curso_academico_id' => 'required|exists:cursos_academicos,id', // Should not change usually
-            // 'empresa_id' => 'required|exists:empresas,id', // Should not change usually
             'sede_id' => 'required|exists:sedes,id',
-            'empleado_id' => 'required|exists:empleados,id', // Tutor laboral
-            'profesor_id' => 'required|exists:users,id', // Tutor docente
+            'empleado_id' => 'required|exists:empleados,id',
+            'profesor_id' => 'required|exists:users,id',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'total_horas' => 'required|integer|min:1',
@@ -145,7 +136,7 @@ class ConvenioController extends Controller
         return redirect()->route('convenios.index')->with('success', 'Convenio actualizado correctamente.');
     }
     /**
-     * Remove the specified resource from storage.
+     * Eliminación de Convenio.
      */
     public function destroy($id)
     {
@@ -171,7 +162,6 @@ class ConvenioController extends Controller
             /** @var \App\Models\Convenio $convenio */
             $updated = false;
             
-            // Check student's course (1º or 2º)
             if ($convenio->alumno && $convenio->alumno->curso) {
                 if (str_contains($convenio->alumno->curso->nombre, '1º')) {
                     $convenio->total_horas = $horas1;

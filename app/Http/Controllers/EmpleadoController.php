@@ -100,7 +100,7 @@ class EmpleadoController extends Controller
     }
 
     /**
-     * Elimina un EMpleado.
+     * Elimina un Empleado.
      */
     public function destroy(string $id)
     {

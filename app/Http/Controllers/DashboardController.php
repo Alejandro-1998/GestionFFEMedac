@@ -20,7 +20,6 @@ class DashboardController extends Controller
             'empleados' => Empleado::count(),
         ];
 
-        // Obtener los últimos 5 registros de actividad
         $actividades = RegistroActividad::with('sujeto')->latest()->take(5)->get();
 
         return view('dashboard', compact('stats', 'actividades'));

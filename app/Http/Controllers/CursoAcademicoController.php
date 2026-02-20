@@ -14,10 +14,8 @@ class CursoAcademicoController extends Controller
      */
     public function marcarComoActual($id)
     {
-        // Set all to false
         CursoAcademico::query()->update(['actual' => false]);
-        
-        // Set the requested one to true
+
         $curso = CursoAcademico::findOrFail($id);
         $curso->update(['actual' => true]);
 
@@ -64,9 +62,6 @@ class CursoAcademicoController extends Controller
     /**
      * Muestra un Curso Académico (Año) y sus Módulos.
      */
-    /**
-     * Muestra un Curso Académico (Año) y sus Módulos.
-     */
     public function show($id)
     {
         $curso = CursoAcademico::with('modulos.cursos')->findOrFail($id);
@@ -109,8 +104,6 @@ class CursoAcademicoController extends Controller
     public function destroy($id)
     {
         $curso = CursoAcademico::findOrFail($id);
-        // Cascade delete should handle related modules/courses via DB constraints? 
-        // Or we can delete related manually if needed but DB constrained ->onDelete('cascade') is set for modulos.
         $curso->delete();
 
         return redirect()->route('cursos.index')->with('success', 'Año académico eliminado correctamente.');

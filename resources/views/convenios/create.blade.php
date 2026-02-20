@@ -93,8 +93,7 @@
 
                 filterAlumnos() {
                     if (this.selectedCursoId) {
-                        // Assuming 'curso_academico_id' is present in the alumno object. 
-                        // Note: Ensure the controller passes 'curso_academico_id' in the JSON.
+
                         this.availableAlumnos = this.allAlumnos.filter(a => a.curso_academico_id == this.selectedCursoId);
                     } else {
                         this.availableAlumnos = [];
