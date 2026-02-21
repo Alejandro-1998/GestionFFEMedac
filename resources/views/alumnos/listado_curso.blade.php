@@ -78,12 +78,16 @@
                                                 <span class="text-gray-400 text-xs">-</span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            <div class="inline-flex flex-row border border-gray-200 rounded-md overflow-hidden bg-white shadow-sm h-6">
-                                                @foreach(['nota_1', 'nota_2', 'nota_3', 'nota_4', 'nota_5', 'nota_6', 'nota_7', 'nota_8'] as $nota)
-                                                    <div class="w-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 text-xs {{ isset($alumno->$nota) ? ($alumno->$nota >= 5 ? 'bg-green-50 text-green-700 font-medium' : 'bg-red-50 text-red-700 font-medium') : 'text-gray-300' }}" title="{{ ucfirst(str_replace('_', ' ', $nota)) }}">
-                                                        {{ $alumno->$nota ?? '-' }}
-                                                    </div>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex flex-row flex-wrap gap-1 justify-center">
+                                                @foreach(['nota_1', 'nota_2', 'nota_3', 'nota_4', 'nota_5', 'nota_6', 'nota_7', 'nota_8'] as $i => $nota)
+                                                    <span class="inline-flex items-center justify-center w-9 h-6 rounded text-xs font-semibold border
+                                                        {{ isset($alumno->$nota)
+                                                            ? ($alumno->$nota >= 5 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200')
+                                                            : 'bg-gray-50 text-gray-300 border-gray-200' }}"
+                                                        title="Nota {{ $i + 1 }}">
+                                                        {{ isset($alumno->$nota) ? number_format($alumno->$nota, 1) : '-' }}
+                                                    </span>
                                                 @endforeach
                                             </div>
                                         </td>

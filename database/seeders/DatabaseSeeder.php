@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\CursoAcademico;
 use App\Models\Modulo;
 use App\Models\Curso;
 use App\Models\Alumno;
@@ -10,6 +9,7 @@ use App\Models\Empresa;
 use App\Models\Sede;
 use App\Models\Empleado;
 use App\Models\Convenio;
+use App\Models\CursoAcademico;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -22,38 +22,41 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(UserSeeder::class);
+        $this->call(CursoAcademicoSeeder::class);
 
-        // 2. Create Academic Years (Cursos Academicos)
-        $year2425 = CursoAcademico::create(['anyo' => '2024-2025']);
-        $year2526 = CursoAcademico::create(['anyo' => '2025-2026']);
+        // Obtener años académicos
+        $anyo2526 = CursoAcademico::where('anyo', '2025-2026')->first();
 
-        // 3. Create Modules (Titulaciones) for 2024-2025
-        $moduloDAW = Modulo::create([
-            'nombre' => 'Desarrollo de Aplicaciones Web',
-        ]);
-        $year2425->modulos()->attach($moduloDAW->id);
+        // Obtener módulos
+        $moduloDAW       = Modulo::where('nombre', 'Desarrollo de Aplicaciones Web')->first();
+        $moduloMarketing = Modulo::where('nombre', 'Marketing y Publicidad')->first();
+        $moduloAmbiente  = Modulo::where('nombre', 'Guía en el Medio Natural y el Tiempo Libre')->first();
 
-        $moduloMarketing = Modulo::create([
-            'nombre' => 'Marketing y Publicidad',
-        ]);
-        $year2425->modulos()->attach($moduloMarketing->id);
+        // Obtener cursos por módulo
+        $curso1DAW       = Curso::where('nombre', '1º')->where('modulo_id', $moduloDAW->id)->first();
+        $curso1Marketing = Curso::where('nombre', '1º')->where('modulo_id', $moduloMarketing->id)->first();
+        $curso2Marketing = Curso::where('nombre', '2º')->where('modulo_id', $moduloMarketing->id)->first();
+        $curso1Ambiente  = Curso::where('nombre', '1º')->where('modulo_id', $moduloAmbiente->id)->first();
 
-        // 4. Create Cursos (Groups: 1º, 2º) for Modules
-        $curso1DAW = Curso::create(['nombre' => '1º', 'modulo_id' => $moduloDAW->id]);
-        $curso2DAW = Curso::create(['nombre' => '2º', 'modulo_id' => $moduloDAW->id]);
-        
-        $curso1Marketing = Curso::create(['nombre' => '1º', 'modulo_id' => $moduloMarketing->id]);
-        // Marketing only has 1st year for now in this example
-
-        // 5. Create Students (Alumnos) assigned to Cursos
-        Alumno::factory()->count(10)->create([
-            'curso_id' => $curso2DAW->id, // Assign to 2º DAW
-            'curso_academico_id' => $year2425->id,
+        // Crear alumnos por curso y año académico
+        Alumno::factory()->count(27)->create([
+            'curso_id'           => $curso1Marketing->id,
+            'curso_academico_id' => $anyo2526->id,
         ]);
 
-        Alumno::factory()->count(5)->create([
-            'curso_id' => $curso1DAW->id, // Assign to 1º DAW
-            'curso_academico_id' => $year2425->id,
+        Alumno::factory()->count(30)->create([
+            'curso_id'           => $curso2Marketing->id,
+            'curso_academico_id' => $anyo2526->id,
+        ]);
+
+        Alumno::factory()->count(24)->create([
+            'curso_id'           => $curso1DAW->id,
+            'curso_academico_id' => $anyo2526->id,
+        ]);
+
+        Alumno::factory()->count(32)->create([
+            'curso_id'           => $curso1Ambiente->id,
+            'curso_academico_id' => $anyo2526->id,
         ]);
 
         // 6. Create Companies (Empresas)
@@ -75,10 +78,10 @@ class DatabaseSeeder extends Seeder
 
         // 7. Assign Companies to Modules
         // Tech Solutions works with DAW
-        $empresa1->modulos()->attach($moduloDAW->id);
+        // $empresa1->modulos()->attach($moduloDAW->id);
         
-        // Marketing Creativo works with Marketing
-        $empresa2->modulos()->attach($moduloMarketing->id);
+        // // Marketing Creativo works with Marketing
+        // $empresa2->modulos()->attach($moduloMarketing->id);
 
 
         // 8. Create Sedes and Empleados (Tutors)

@@ -55,14 +55,4 @@ class Convenio extends Model
     {
         return $this->belongsTo(CursoAcademico::class, 'curso_academico_id');
     }
-
-    public function memorias()
-    {
-        return $this->hasMany(Memoria::class);
-    }
-
-    public function visitas()
-    {
-        return $this->hasMany(Visita::class);
-    }
 }
