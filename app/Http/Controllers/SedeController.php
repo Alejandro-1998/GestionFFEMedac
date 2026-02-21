@@ -15,7 +15,9 @@ class SedeController extends Controller
         $query = Sede::query();
 
         if ($request->has('search')) {
+
             $search = $request->input('search');
+
             $query->where('nombre', 'like', "%{$search}%")
                   ->orWhere('ubicacion', 'like', "%{$search}%")
                   ->orWhere('direccion', 'like', "%{$search}%")
@@ -26,9 +28,7 @@ class SedeController extends Controller
 
         $sedes = $query->with('empresa')->get();
         
-        if ($request->ajax()) {
-            return view('sedes.partials.table-rows', compact('sedes'));
-        }
+        if ($request->ajax()) return view('sedes.partials.table-rows', compact('sedes'));
 
         return view("sedes.index", compact("sedes"));
     }
@@ -39,6 +39,7 @@ class SedeController extends Controller
     public function show($id)
     {
         $sede = Sede::with(['empresa', 'empleados'])->findOrFail($id);
+
         return view("sedes.show", compact("sede"));
     }
 
@@ -83,6 +84,7 @@ class SedeController extends Controller
     public function destroy(Sede $sede)
     {
         $sede->delete();
+        
         return redirect()->back()->with('success', 'Sede eliminada correctamente.');
     }
 }

@@ -7,6 +7,9 @@ use App\Models\User;
 use App\Models\Empresa;
 use App\Models\CursoAcademico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Alumno;
+use App\Models\Configuracion;
 
 class ConvenioController extends Controller
 {
@@ -18,7 +21,9 @@ class ConvenioController extends Controller
         $query = Convenio::with(['alumno', 'empresa', 'curso']);
 
         if ($request->has('search') && $request->search != '') {
+
             $search = $request->input('search');
+
             $query->where(function($q) use ($search) {
                 $q->whereHas('alumno', function($subQ) use ($search) {
                     $subQ->where('nombre_completo', 'like', "%{$search}%");
@@ -28,13 +33,9 @@ class ConvenioController extends Controller
             });
         }
 
-        if ($request->has('curso_academico_id') && $request->curso_academico_id != '') {
-            $query->where('curso_academico_id', $request->curso_academico_id);
-        }
-
-        if ($request->has('estado') && $request->estado != '') {
-            $query->where('estado', $request->estado);
-        }
+        if ($request->has('curso_academico_id') && $request->curso_academico_id != '') $query->where('curso_academico_id', $request->curso_academico_id);
+            
+        if ($request->has('estado') && $request->estado != '') $query->where('estado', $request->estado);
 
         $convenios = $query->paginate(10);
         $cursos = CursoAcademico::all();
@@ -48,6 +49,7 @@ class ConvenioController extends Controller
     public function show($id)
     {
         $convenio = Convenio::with(['alumno', 'empresa', 'curso', 'sede', 'tutorLaboral', 'profesor'])->findOrFail($id);
+
         return view('convenios.show', compact('convenio'));
     }
     /**
@@ -56,18 +58,21 @@ class ConvenioController extends Controller
     public function create()
     {
         /** @var \App\Models\User $user */
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = Auth::user();
         if ($user && $user->rol === 'profesor') {
+
             $cursoIds = $user->cursos()->pluck('cursos_academicos.id');
 
-            $alumnos = \App\Models\Alumno::whereHas('curso.modulo', function($q) use ($cursoIds) {
+            $alumnos = Alumno::whereHas('curso.modulo', function($q) use ($cursoIds) {
                             $q->whereIn('curso_academico_id', $cursoIds);
                         })
                         ->whereDoesntHave('convenios')
                         ->get();
+
             $cursos = $user->cursos;
-        } else {
-            $alumnos = \App\Models\Alumno::whereDoesntHave('convenios')->get();
+        }
+        else {
+            $alumnos = Alumno::whereDoesntHave('convenios')->get();
             $cursos = CursoAcademico::all();
         } 
         
@@ -86,7 +91,6 @@ class ConvenioController extends Controller
             'alumno_id' => 'required|exists:alumnos,id|unique:convenios,alumno_id',
             'curso_academico_id' => 'required|exists:cursos_academicos,id',
             'empresa_id' => 'required|exists:empresas,id',
-        ], [
             'alumno_id.exists' => 'El alumno seleccionado no es válido.',
             'alumno_id.required' => 'Debes seleccionar un alumno.',
             'curso_academico_id.exists' => 'El curso académico seleccionado no es válido.',
@@ -146,14 +150,12 @@ class ConvenioController extends Controller
         return redirect()->route('convenios.index')->with('success', 'Convenio eliminado correctamente.');
     }
 
-    public function bulkUpdateHours()
+    public function establecerHoras()
     {
-        $horas1 = \App\Models\Configuracion::where('clave', 'total_horas_1')->value('valor');
-        $horas2 = \App\Models\Configuracion::where('clave', 'total_horas_2')->value('valor');
+        $horas1 = Configuracion::where('clave', 'total_horas_1')->value('valor');
+        $horas2 = Configuracion::where('clave', 'total_horas_2')->value('valor');
 
-        if (!$horas1 && !$horas2) {
-            return redirect()->back()->with('error', 'No se han configurado las horas globales.');
-        }
+        if (!$horas1 && !$horas2) return redirect()->back()->with('error', 'No se han configurado las horas globales.');
 
         $convenios = Convenio::with('alumno.curso')->get();
         $count = 0;
@@ -163,16 +165,21 @@ class ConvenioController extends Controller
             $updated = false;
             
             if ($convenio->alumno && $convenio->alumno->curso) {
+
                 if (str_contains($convenio->alumno->curso->nombre, '1º')) {
+
                     $convenio->total_horas = $horas1;
                     $updated = true;
-                } elseif (str_contains($convenio->alumno->curso->nombre, '2º')) {
+                }
+                elseif (str_contains($convenio->alumno->curso->nombre, '2º')) {
+
                     $convenio->total_horas = $horas2;
                     $updated = true;
                 }
             }
 
             if ($updated) {
+                
                 $convenio->save();
                 $count++;
             }
