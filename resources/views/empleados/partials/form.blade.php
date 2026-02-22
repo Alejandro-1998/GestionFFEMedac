@@ -1,4 +1,4 @@
-@props(['empleado' => null, 'sedes' => [], 'suffix' => ''])
+@props(['empleado' => null, 'sedes' => [], 'modulos' => [], 'suffix' => ''])
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- DNI/Pasaporte -->
@@ -77,6 +77,22 @@
                 @endif
             @endif
         </select>
+    </div>
+
+    <!-- Módulos -->
+    <div class="md:col-span-2">
+        <label for="modulos_{{ $suffix }}" class="block text-sm font-medium text-gray-700">Módulos</label>
+        <select name="modulos[]" id="modulos_{{ $suffix }}" multiple class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" size="4">
+            @foreach($modulos as $modulo)
+                @php
+                    $seleccionado = $empleado ? $empleado->modulos->contains('id', $modulo->id) : false;
+                @endphp
+                <option value="{{ $modulo->id }}" {{ $seleccionado ? 'selected' : '' }}>
+                    {{ $modulo->nombre }}
+                </option>
+            @endforeach
+        </select>
+        <p class="mt-1 text-xs text-gray-500">Mantén Ctrl (o Cmd) para seleccionar varios módulos.</p>
     </div>
     
     <!-- Activo -->

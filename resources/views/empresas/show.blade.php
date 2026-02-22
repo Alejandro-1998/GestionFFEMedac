@@ -121,7 +121,7 @@
                                                         @method('PUT')
                                                         <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
                                         
-                                                        @include('empleados.partials.form', ['empleado' => $empleado, 'sedes' => $empresa->sedes, 'suffix' => $empleado->id])
+                                                        @include('empleados.partials.form', ['empleado' => $empleado, 'sedes' => $empresa->sedes, 'modulos' => $modulos, 'suffix' => $empleado->id])
                                         
                                                         <div class="mt-6 flex justify-end">
                                                             <button type="button" x-on:click="$dispatch('close')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition duration-300 mr-2">
@@ -227,7 +227,7 @@
                 @csrf
                 <input type="hidden" name="empresa_id" value="{{ $empresa->id }}">
 
-                @include('empleados.partials.form', ['sedes' => $empresa->sedes])
+                @include('empleados.partials.form', ['sedes' => $empresa->sedes, 'modulos' => $modulos])
 
                 <div class="mt-6 flex justify-end">
                     <button type="button" x-on:click="$dispatch('close')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition duration-300 mr-2">

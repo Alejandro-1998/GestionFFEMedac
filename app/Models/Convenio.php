@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\RegistrarActividad;
+use Carbon\Carbon;
 
 class Convenio extends Model
 {
@@ -54,5 +55,20 @@ class Convenio extends Model
     public function curso()
     {
         return $this->belongsTo(CursoAcademico::class, 'curso_academico_id');
+    }
+    public function getEstadoAttribute(): string
+    {
+        $raw = $this->attributes['estado'] ?? null;
+
+        if ($raw === 'cancelada') return 'cancelada';
+
+        $hoy    = Carbon::today();
+        $inicio = $this->fecha_inicio ? Carbon::parse($this->fecha_inicio) : null;
+        $fin    = $this->fecha_fin    ? Carbon::parse($this->fecha_fin)    : null;
+
+        if (!$inicio)          return 'asignada';
+        if ($hoy->lt($inicio)) return 'asignada';
+        if (!$fin || $hoy->lte($fin)) return 'en_proceso';
+        return 'finalizada';
     }
 }

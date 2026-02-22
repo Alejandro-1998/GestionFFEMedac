@@ -9,6 +9,7 @@ use App\Models\Alumno;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\AlumnosImport;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -19,15 +20,22 @@ class AlumnoController extends Controller
      */
     public function index(Request $request)
     {
+        $usuario = Auth::user();
         $query = Alumno::with(['empresa', 'curso.modulo', 'cursoAcademico']);
+
+        $modulosVisibles = $usuario->rol === 'admin'
+            ? null
+            : $usuario->modulos->pluck('id');
+
+        if ($modulosVisibles !== null) {
+            $cursosDeModulos = Curso::whereIn('modulo_id', $modulosVisibles)->pluck('id');
+            $query->whereIn('curso_id', $cursosDeModulos);
+        }
 
         // Buscador
         if ($request->has('search')) {
-
             $search = $request->input('search');
-
             $query->where(function ($q) use ($search) {
-
                 $q->where('nombre_completo', 'like', "%{$search}%")->orWhere('dni', 'like', "%{$search}%");
             });
         }
@@ -36,20 +44,28 @@ class AlumnoController extends Controller
 
         // Filtro Curso Académico
         if ($request->filled('curso_academico_id')) {
-
             $query->where('curso_academico_id', $request->curso_academico_id);
 
-            $cursosDisponibles = Curso::whereHas('modulo.cursosAcademicos', function ($q) use ($request) {
-
+            $cursosQuery = Curso::whereHas('modulo.cursosAcademicos', function ($q) use ($request) {
                 $q->where('curso_academico_modulo.curso_academico_id', $request->curso_academico_id);
-            })->with('modulo')->get();
-        }
-        else {
+            })->with('modulo');
 
-            $cursosDisponibles = Curso::with('modulo')->get();
+            if ($modulosVisibles !== null) {
+                $cursosQuery->whereIn('modulo_id', $modulosVisibles);
+            }
+
+            $cursosDisponibles = $cursosQuery->get();
+        } else {
+            $cursosQuery = Curso::with('modulo');
+
+            if ($modulosVisibles !== null) {
+                $cursosQuery->whereIn('modulo_id', $modulosVisibles);
+            }
+
+            $cursosDisponibles = $cursosQuery->get();
         }
 
-        // Filter Módulo
+        // Filtro Módulo
         if ($request->filled('curso_id')) $query->where('curso_id', $request->curso_id);
 
         $cursos = CursoAcademico::with(['modulos.cursos'])->get();

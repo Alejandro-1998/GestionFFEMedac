@@ -6,7 +6,7 @@ use App\Models\Modulo;
 use App\Models\Curso;
 use App\Models\CursoAcademico;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ModuloController extends Controller
@@ -16,16 +16,29 @@ class ModuloController extends Controller
      */
     public function index()
     {
+        $usuario = Auth::user();
         $cursoActual = CursoAcademico::where('actual', true)->first();
 
+        if ($usuario->rol === 'admin') {
+            $modulosBase = Modulo::query();
+        } else {
+            $modulosAsignados = $usuario->modulos->pluck('id');
+            $modulosBase = Modulo::whereIn('id', $modulosAsignados);
+        }
+
         if ($cursoActual) {
-            $modulosActivos = $cursoActual->modulos;
-            $otrosModulos = Modulo::whereDoesntHave('cursosAcademicos', function ($query) use ($cursoActual) {
-                $query->where('id', $cursoActual->id);
-            })->get();
+            $modulosActivos = (clone $modulosBase)
+                ->whereHas('cursosAcademicos', function ($q) use ($cursoActual) {
+                    $q->where('id', $cursoActual->id);
+                })->with('cursos.alumnos')->get();
+
+            $otrosModulos = (clone $modulosBase)
+                ->whereDoesntHave('cursosAcademicos', function ($query) use ($cursoActual) {
+                    $query->where('id', $cursoActual->id);
+                })->with('cursos.alumnos')->get();
         } else {
             $modulosActivos = collect();
-            $otrosModulos = Modulo::all();
+            $otrosModulos = $modulosBase->with('cursos.alumnos')->get();
         }
 
         return view('modulos.index', compact('modulosActivos', 'otrosModulos'));

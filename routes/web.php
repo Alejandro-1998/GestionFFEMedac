@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cursos/{id}/sync-modulos', [CursoAcademicoController::class, 'syncModulos'])->name('cursos.syncModulos')->middleware('can:access-management');
     Route::post('/cursos/{id}/actual', [CursoAcademicoController::class, 'marcarComoActual'])->name('cursos.actual')->middleware('can:access-management');
     Route::post('/convenios/establecerHoras', [ConvenioController::class, 'establecerHoras'])->name('convenios.establecerHoras')->middleware('can:access-management');
+    Route::patch('/convenios/{convenio}/cancelar', [ConvenioController::class, 'cancelar'])->name('convenios.cancelar')->middleware('can:access-management');
     Route::resource('convenios', ConvenioController::class)->middleware('can:access-management');
     Route::post('/cursos/{id}/importar-alumnos', [CursoAcademicoController::class, 'importarAlumnos'])->name('cursos.importarAlumnos')->middleware('can:access-management');
     Route::get('/cursos/{id}/exportar-pdf', [CursoAcademicoController::class, 'exportarPdf'])->name('cursos.exportarPdf')->middleware('can:access-management');

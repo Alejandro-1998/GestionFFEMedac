@@ -6,6 +6,8 @@ use App\Models\Convenio;
 use App\Models\User;
 use App\Models\Empresa;
 use App\Models\CursoAcademico;
+use App\Models\Modulo;
+use App\Models\Curso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Alumno;
@@ -35,7 +37,32 @@ class ConvenioController extends Controller
 
         if ($request->has('curso_academico_id') && $request->curso_academico_id != '') $query->where('curso_academico_id', $request->curso_academico_id);
             
-        if ($request->has('estado') && $request->estado != '') $query->where('estado', $request->estado);
+        if ($request->filled('estado')) {
+            $estado = $request->estado;
+            $hoy = now()->toDateString();
+
+            if ($estado === 'cancelada') {
+                $query->where('estado', 'cancelada');
+            } elseif ($estado === 'asignada') {
+                $query->where('estado', '!=', 'cancelada')
+                      ->where(function ($q) use ($hoy) {
+                          $q->whereNull('fecha_inicio')
+                            ->orWhere('fecha_inicio', '>', $hoy);
+                      });
+            } elseif ($estado === 'en_proceso') {
+                $query->where('estado', '!=', 'cancelada')
+                      ->where('fecha_inicio', '<=', $hoy)
+                      ->where(function ($q) use ($hoy) {
+                          $q->whereNull('fecha_fin')
+                            ->orWhere('fecha_fin', '>=', $hoy);
+                      });
+            } elseif ($estado === 'finalizada') {
+                $query->where('estado', '!=', 'cancelada')
+                      ->whereNotNull('fecha_fin')
+                      ->where('fecha_fin', '<', $hoy);
+            }
+        }
+
 
         $convenios = $query->paginate(10);
         $cursos = CursoAcademico::all();
@@ -57,29 +84,45 @@ class ConvenioController extends Controller
      */
     public function create()
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        if ($user && $user->rol === 'profesor') {
+        /** @var \App\Models\User $usuario */
+        $usuario = Auth::user();
+        $cursoActual = CursoAcademico::where('actual', true)->first();
 
-            $cursoIds = $user->cursos()->pluck('cursos_academicos.id');
-
-            $alumnos = Alumno::whereHas('curso.modulo', function($q) use ($cursoIds) {
-                            $q->whereIn('curso_academico_id', $cursoIds);
-                        })
-                        ->whereDoesntHave('convenios')
-                        ->get();
-
-            $cursos = $user->cursos;
+        if ($usuario->rol === 'admin') {
+            $modulos = Modulo::with('cursos')->get();
+            $empresas = Empresa::orderBy('nombre')->get();
+        } else {
+            $modulos = $usuario->modulos()->with('cursos')->get();
+            $modulosIds = $modulos->pluck('id');
+            $empresas = Empresa::whereHas('modulos', function ($q) use ($modulosIds) {
+                $q->whereIn('modulos.id', $modulosIds);
+            })->orderBy('nombre')->get();
         }
-        else {
-            $alumnos = Alumno::whereDoesntHave('convenios')->get();
-            $cursos = CursoAcademico::all();
-        } 
-        
-        $profesores = User::where('rol', 'profesor')->get(); 
-        $empresas = Empresa::with(['sedes', 'empleados'])->get();
 
-        return view('convenios.create', compact('alumnos', 'profesores', 'empresas', 'cursos'));
+        $modulosIds = $modulos->pluck('id');
+        $cursosIds = Curso::whereIn('modulo_id', $modulosIds)->pluck('id');
+
+        $alumnos = Alumno::whereIn('curso_id', $cursosIds)
+            ->when($cursoActual, fn($q) => $q->where('curso_academico_id', $cursoActual->id))
+            ->whereDoesntHave('convenios')
+            ->with('curso.modulo')
+            ->get()
+            ->map(fn($a) => [
+                'id'              => $a->id,
+                'nombre_completo' => $a->nombre_completo,
+                'curso_id'        => $a->curso_id,
+                'modulo_id'       => $a->curso?->modulo_id,
+            ]);
+
+        $modulosJson = $modulos->map(fn($m) => [
+            'id'     => $m->id,
+            'nombre' => $m->nombre,
+            'cursos' => $m->cursos->map(fn($c) => ['id' => $c->id, 'nombre' => $c->nombre]),
+        ]);
+
+        $profesores = User::where('rol', 'profesor')->get();
+
+        return view('convenios.create', compact('alumnos', 'profesores', 'empresas', 'modulosJson'));
     }
 
     /**
@@ -88,25 +131,31 @@ class ConvenioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'alumno_id' => 'required|exists:alumnos,id|unique:convenios,alumno_id',
-            'curso_academico_id' => 'required|exists:cursos_academicos,id',
+            'alumno_id'  => 'required|exists:alumnos,id|unique:convenios,alumno_id',
             'empresa_id' => 'required|exists:empresas,id',
-            'alumno_id.exists' => 'El alumno seleccionado no es válido.',
-            'alumno_id.required' => 'Debes seleccionar un alumno.',
-            'curso_academico_id.exists' => 'El curso académico seleccionado no es válido.',
-            'curso_academico_id.required' => 'Debes seleccionar un curso académico.',
-            'empresa_id.exists' => 'La empresa seleccionada no es válida.',
+        ], [
+            'alumno_id.required'  => 'Debes seleccionar un alumno.',
+            'alumno_id.exists'    => 'El alumno seleccionado no es válido.',
+            'alumno_id.unique'    => 'Este alumno ya tiene un convenio asignado.',
             'empresa_id.required' => 'Debes seleccionar una empresa.',
+            'empresa_id.exists'   => 'La empresa seleccionada no es válida.',
         ]);
 
-        $convenio = Convenio::create([
-            'alumno_id' => $request->alumno_id,
-            'curso_academico_id' => $request->curso_academico_id,
-            'empresa_id' => $request->empresa_id,   
+        $alumno = Alumno::findOrFail($request->alumno_id);
+
+        /** @var \App\Models\User $usuario */
+        $usuario = Auth::user();
+
+        Convenio::create([
+            'alumno_id'          => $alumno->id,
+            'curso_academico_id' => $alumno->curso_academico_id,
+            'empresa_id'         => $request->empresa_id,
+            'profesor_id'        => $usuario->rol === 'profesor' ? $usuario->id : null,
         ]);
 
         return redirect()->route('convenios.index')->with('success', 'Convenio creado correctamente. Ahora puedes completar los detalles.');
     }
+
 
     /**
      * Formulario de edición.
@@ -150,41 +199,65 @@ class ConvenioController extends Controller
         return redirect()->route('convenios.index')->with('success', 'Convenio eliminado correctamente.');
     }
 
+    public function cancelar(Convenio $convenio)
+    {
+        $convenio->update(['estado' => 'cancelada']);
+        return redirect()->route('convenios.show', $convenio->id)->with('success', 'El convenio ha sido cancelado.');
+    }
+
     public function establecerHoras()
     {
-        $horas1 = Configuracion::where('clave', 'total_horas_1')->value('valor');
-        $horas2 = Configuracion::where('clave', 'total_horas_2')->value('valor');
+        /** @var \App\Models\User $usuario */
+        $usuario = Auth::user();
+
+        $horas1        = Configuracion::where('clave', 'total_horas_1')->value('valor');
+        $horas2        = Configuracion::where('clave', 'total_horas_2')->value('valor');
+        $fechaInicio1  = Configuracion::where('clave', 'fecha_inicio_1')->value('valor');
+        $fechaFin1     = Configuracion::where('clave', 'fecha_fin_1')->value('valor');
+        $fechaInicio2  = Configuracion::where('clave', 'fecha_inicio_2')->value('valor');
+        $fechaFin2     = Configuracion::where('clave', 'fecha_fin_2')->value('valor');
 
         if (!$horas1 && !$horas2) return redirect()->back()->with('error', 'No se han configurado las horas globales.');
 
-        $convenios = Convenio::with('alumno.curso')->get();
+        $query = Convenio::with('alumno.curso.modulo');
+
+        if ($usuario->rol === 'profesor') {
+            $modulosIds = $usuario->modulos()->pluck('modulos.id');
+            $query->whereHas('alumno.curso', function ($q) use ($modulosIds) {
+                $q->whereIn('modulo_id', $modulosIds);
+            });
+        }
+
+        $convenios = $query->get();
         $count = 0;
 
         foreach ($convenios as $convenio) {
             /** @var \App\Models\Convenio $convenio */
             $updated = false;
-            
+
             if ($convenio->alumno && $convenio->alumno->curso) {
+                $es1 = str_contains($convenio->alumno->curso->nombre, '1º');
+                $es2 = str_contains($convenio->alumno->curso->nombre, '2º');
 
-                if (str_contains($convenio->alumno->curso->nombre, '1º')) {
-
+                if ($es1) {
                     $convenio->total_horas = $horas1;
+                    if ($fechaInicio1) $convenio->fecha_inicio = $fechaInicio1;
+                    if ($fechaFin1)    $convenio->fecha_fin    = $fechaFin1;
                     $updated = true;
-                }
-                elseif (str_contains($convenio->alumno->curso->nombre, '2º')) {
-
+                } elseif ($es2) {
                     $convenio->total_horas = $horas2;
+                    if ($fechaInicio2) $convenio->fecha_inicio = $fechaInicio2;
+                    if ($fechaFin2)    $convenio->fecha_fin    = $fechaFin2;
                     $updated = true;
                 }
             }
 
             if ($updated) {
-                
                 $convenio->save();
                 $count++;
             }
         }
 
-        return redirect()->back()->with('success', "Se han actualizado las horas de {$count} convenios.");
+        return redirect()->back()->with('success', "Se han actualizado las horas y fechas de {$count} convenios.");
     }
 }

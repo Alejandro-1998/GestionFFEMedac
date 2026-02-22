@@ -4,8 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Empresa;
-use App\Models\Sede;
-use App\Models\Empleado;
+use App\Models\Modulo;
 
 class EmpresaSeeder extends Seeder
 {
@@ -14,26 +13,28 @@ class EmpresaSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear Empresas con sus Sedes y Empleados (asegurando consistencia)
-        Empresa::factory(5)->create()->each(function ($empresa) {
-            // Cada empresa tiene entre 1 y 3 sedes
-            $sedes = Sede::factory(rand(1, 3))->create(['empresa_id' => $empresa->id]);
-            
-            // Crear empleados para esta empresa, asignándolos a una sede de ESTA empresa
-            Empleado::factory(rand(2, 5))->create([
-                'empresa_id' => $empresa->id,
-                'sede_id' => $sedes->random()->id,
-            ]);
+        $empresa1 = Empresa::create([
+            'nombre' => 'ABP Tecnológica',
+            'email' => 'abp@tecnologica.com',
+            'telefono' => '+34 618 973 197',
+            'direccion' => 'Astrónoma Cecilia Payne S/N, Edificio Centauro M 2.5',
+            'nif' => 'A12345678',
+        ]);
 
-            // Asociar a un ciclo aleatorio (ej. DAW)
-            $ciclo = \App\Models\Ciclo::inRandomOrder()->first();
-            if ($ciclo) {
-                $empresa->ciclos()->attach($ciclo->id);
+        $empresa2 = Empresa::create([
+            'nombre' => 'Nogomet Comunicación',
+            'email' => 'info@nogometcomunicacion.com',
+            'telefono' => '857 803 925',
+            'direccion' => 'C/ Cruz Conde, 19, Oficina 1',
+            'nif' => 'B87654321',
+        ]);
 
-                // Asociar cursos pertenecientes a ese ciclo
-                $cursos = \App\Models\CursoAcademico::where('ciclo_id', $ciclo->id)->get();
-                $empresa->cursos()->sync($cursos);
-            }
-        });
+        // Obtener módulos
+        $moduloDAW       = Modulo::where('nombre', 'Desarrollo de Aplicaciones Web')->first();
+        $moduloMarketing = Modulo::where('nombre', 'Marketing y Publicidad')->first();
+
+        $empresa1->modulos()->attach($moduloDAW->id);
+        $empresa2->modulos()->attach($moduloDAW->id);
+        $empresa2->modulos()->attach($moduloMarketing->id);
     }
 }

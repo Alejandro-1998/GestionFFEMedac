@@ -5,6 +5,8 @@
         </h2>
     </x-slot>
 
+    <div x-data="{ confirmCancel: false }">
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -30,13 +32,20 @@
                             </div>
                         </div>
                         <div class="flex space-x-2">
-                             <a href="{{ route('convenios.edit', $convenio->id) }}" class="inline-flex items-center px-3 py-1 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600 focus:outline-none focus:border-yellow-700 focus:ring focus:ring-yellow-200 active:bg-yellow-600 disabled:opacity-25 transition">
+                             <a href="{{ route('convenios.edit', $convenio->id) }}" class="inline-flex items-center px-3 py-1 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600 transition">
                                 Editar
                             </a>
+                            @if($convenio->estado === 'cancelada')
+                                <span class="inline-flex items-center px-3 py-1 bg-gray-200 rounded-md text-xs font-semibold text-gray-500 uppercase">Cancelado</span>
+                            @else
+                                <button type="button" @click="confirmCancel = true" class="inline-flex items-center px-3 py-1 bg-orange-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-600 transition">
+                                    Cancelar Convenio
+                                </button>
+                            @endif
                             <form action="{{ route('convenios.destroy', $convenio->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este convenio?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:border-red-900 focus:ring focus:ring-red-300 active:bg-red-700 disabled:opacity-25 transition">
+                                <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 transition">
                                     Eliminar
                                 </button>
                             </form>
@@ -91,5 +100,39 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Modal confirmación cancelar -->
+    <div x-show="confirmCancel" class="fixed inset-0 z-50 overflow-y-auto" style="display:none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div x-show="confirmCancel" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+            <div x-show="confirmCancel" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="relative bg-white rounded-lg shadow-xl p-6 max-w-md w-full z-10">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Cancelar Convenio</h3>
+                        <p class="mt-2 text-sm text-gray-600">¿Estás seguro? El convenio quedará marcado como <strong>cancelado</strong> y no podrá volver a estado activo automáticamente.</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" @click="confirmCancel = false" class="px-4 py-2 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        Volver
+                    </button>
+                    <form action="{{ route('convenios.cancelar', $convenio->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="px-4 py-2 rounded-md bg-orange-500 text-sm font-medium text-white hover:bg-orange-600 transition">
+                            Sí, cancelar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
 </x-app-layout>

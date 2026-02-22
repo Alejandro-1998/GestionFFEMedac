@@ -40,4 +40,9 @@ class Empleado extends Model
     {
         return $this->hasMany(Convenio::class, 'empleado_id');
     }
+
+    public function modulos()
+    {
+        return $this->belongsToMany(Modulo::class, 'empleado_modulo');
+    }
 }

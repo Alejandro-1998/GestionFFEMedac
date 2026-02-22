@@ -35,7 +35,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cursos Asignados</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Módulos Asignados</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
@@ -50,13 +50,13 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             <div class="flex flex-wrap gap-1">
-                                                @foreach($profesor->cursos as $curso)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                                        {{ $curso->anyo }}
+                                                @foreach($profesor->modulos as $modulo)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                        {{ $modulo->nombre }}
                                                     </span>
                                                 @endforeach
-                                                @if($profesor->cursos->isEmpty())
-                                                    <span class="text-gray-400 italic">Sin cursos</span>
+                                                @if($profesor->modulos->isEmpty())
+                                                    <span class="text-gray-400 italic">Sin módulos</span>
                                                 @endif
                                             </div>
                                         </td>

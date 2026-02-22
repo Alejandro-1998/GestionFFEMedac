@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Empleado;
+use App\Models\Modulo;
 
 use Illuminate\Validation\Rule;
 
@@ -28,13 +29,14 @@ class EmpleadoController extends Controller
                   });
         }
 
-        $empleados = $query->with(['empresa', 'sede'])->get();
+        $empleados = $query->with(['empresa', 'sede', 'modulos'])->get();
+        $modulos = Modulo::all();
         
         if ($request->ajax()) {
-            return view('empleados.partials.table-rows', compact('empleados'));
+            return view('empleados.partials.table-rows', compact('empleados', 'modulos'));
         }
 
-        return view("empleados.index", compact("empleados"));
+        return view("empleados.index", compact("empleados", "modulos"));
     }
 
     /**
@@ -59,6 +61,12 @@ class EmpleadoController extends Controller
         ]);
 
         $empleado = Empleado::create($request->all());
+
+        if ($request->has('modulos')) {
+            $empleado->modulos()->sync($request->modulos);
+        } else {
+            $empleado->modulos()->detach();
+        }
 
         return redirect()->route('empresas.show', $empleado->empresa_id)->with('success', 'Empleado creado exitosamente.');
     }
@@ -95,6 +103,12 @@ class EmpleadoController extends Controller
 
         $empleado = Empleado::find($id);
         $empleado->update($request->all());
+
+        if ($request->has('modulos')) {
+            $empleado->modulos()->sync($request->modulos);
+        } else {
+            $empleado->modulos()->detach();
+        }
 
         return back()->with('success', 'Empleado actualizado exitosamente.');
     }

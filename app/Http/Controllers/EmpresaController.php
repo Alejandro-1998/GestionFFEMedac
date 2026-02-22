@@ -87,11 +87,12 @@ class EmpresaController extends Controller
      */
     public function show(string $id)
     {
-        $empresa = Empresa::with(['sedes', 'empleados', 'modulos'])->findOrFail($id);
+        $empresa = Empresa::with(['sedes', 'empleados.modulos', 'modulos'])->findOrFail($id);
         
         $modulosAsociados = $empresa->modulos->pluck('nombre');
+        $modulos = Modulo::all();
 
-        return view("empresas.show", compact("empresa", "modulosAsociados"));
+        return view("empresas.show", compact("empresa", "modulosAsociados", "modulos"));
     }
 
     /**

@@ -41,27 +41,26 @@
                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                         </div>
 
-                        <!-- Asignación de Cursos -->
                         <div class="mb-6 border-t pt-4 mt-4">
-                            <h4 class="text-md font-medium text-gray-900 mb-2">Asignar Cursos Académicos</h4>
-                            <p class="text-sm text-gray-500 mb-4">Selecciona los cursos que podrá gestionar este profesor.</p>
+                            <h4 class="text-md font-medium text-gray-900 mb-2">Asignar Módulos</h4>
+                            <p class="text-sm text-gray-500 mb-4">Selecciona los módulos que podrá gestionar este profesor.</p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @forelse($cursos as $curso)
+                                @forelse($modulos as $modulo)
                                     <div class="flex items-start">
                                         <div class="flex items-center h-5">
-                                            <input id="curso_{{ $curso->id }}" name="cursos[]" type="checkbox" value="{{ $curso->id }}" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                                            {{ in_array($curso->id, old('cursos', $cursosAsignados)) ? 'checked' : '' }}>
+                                            <input id="modulo_{{ $modulo->id }}" name="modulos[]" type="checkbox" value="{{ $modulo->id }}" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                            {{ in_array($modulo->id, old('modulos', $modulosAsignados)) ? 'checked' : '' }}>
                                         </div>
                                         <div class="ml-3 text-sm">
-                                            <label for="curso_{{ $curso->id }}" class="font-medium text-gray-700">{{ $curso->anyo }}</label>
+                                            <label for="modulo_{{ $modulo->id }}" class="font-medium text-gray-700">{{ $modulo->nombre }}</label>
                                         </div>
                                     </div>
                                 @empty
-                                    <p class="text-sm text-gray-500 italic">No hay cursos académicos disponibles creados en el sistema.</p>
+                                    <p class="text-sm text-gray-500 italic">No hay módulos disponibles en el sistema.</p>
                                 @endforelse
                             </div>
-                            <x-input-error :messages="$errors->get('cursos')" class="mt-2" />
+                            <x-input-error :messages="$errors->get('modulos')" class="mt-2" />
                         </div>
 
                         <div class="flex items-center justify-end mt-4">

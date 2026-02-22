@@ -30,4 +30,9 @@ class Modulo extends Model
     {
         return $this->belongsToMany(Empresa::class, 'empresa_modulo');
     }
+
+    public function empleados()
+    {
+        return $this->belongsToMany(Empleado::class, 'empleado_modulo');
+    }
 }

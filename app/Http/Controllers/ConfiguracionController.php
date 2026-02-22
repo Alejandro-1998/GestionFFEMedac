@@ -9,13 +9,18 @@ class ConfiguracionController extends Controller
 {
     public function index()
     {
-        $horas1 = Configuracion::firstOrCreate(['clave' => 'total_horas_1'], ['valor' => 0]);
-        $horas2 = Configuracion::firstOrCreate(['clave' => 'total_horas_2'], ['valor' => 0]);
+        $claves = [
+            'total_horas_1', 'total_horas_2',
+            'fecha_inicio_1', 'fecha_fin_1',
+            'fecha_inicio_2', 'fecha_fin_2',
+        ];
 
-        return response()->json([
-            'total_horas_1' => $horas1->valor,
-            'total_horas_2' => $horas2->valor,
-        ]);
+        $config = [];
+        foreach ($claves as $clave) {
+            $config[$clave] = Configuracion::firstOrCreate(['clave' => $clave], ['valor' => ''])->valor;
+        }
+
+        return response()->json($config);
     }
 
     public function update(Request $request)
@@ -23,10 +28,21 @@ class ConfiguracionController extends Controller
         $request->validate([
             'total_horas_1' => 'required|integer|min:0',
             'total_horas_2' => 'required|integer|min:0',
+            'fecha_inicio_1' => 'nullable|date',
+            'fecha_fin_1'    => 'nullable|date',
+            'fecha_inicio_2' => 'nullable|date',
+            'fecha_fin_2'    => 'nullable|date',
         ]);
 
-        Configuracion::updateOrCreate(['clave' => 'total_horas_1'], ['valor' => $request->total_horas_1]);
-        Configuracion::updateOrCreate(['clave' => 'total_horas_2'], ['valor' => $request->total_horas_2]);
+        $claves = [
+            'total_horas_1', 'total_horas_2',
+            'fecha_inicio_1', 'fecha_fin_1',
+            'fecha_inicio_2', 'fecha_fin_2',
+        ];
+
+        foreach ($claves as $clave) {
+            Configuracion::updateOrCreate(['clave' => $clave], ['valor' => $request->input($clave, '')]);
+        }
 
         return response()->json(['message' => 'Configuración actualizada correctamente.']);
     }

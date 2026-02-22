@@ -41,7 +41,7 @@
                                 @endforeach
                             </select>
 
-                            <select name="curso_id" class="rounded-l-none border-l-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm mr-2 w-64" onchange="this.form.submit()">
+                            <select name="curso_id" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm mr-2 w-64" onchange="this.form.submit()">
                                 <option value="">Todos los Módulos</option>
                                 @foreach($cursosDisponibles as $c)
                                     <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>

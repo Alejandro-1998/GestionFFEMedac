@@ -3,42 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\CursoAcademico;
+use App\Models\Modulo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class ProfesorController extends Controller
 {
-    /**
-     * Vista de todos los profesores
-     */
     public function index()
     {
-        $profesores = User::where('rol', 'profesor')->paginate(10);
+        $profesores = User::where('rol', 'profesor')->with('modulos')->paginate(10);
         return view('profesores.index', compact('profesores'));
     }
 
-    /**
-     * Mostrar cursos
-     */
     public function create()
     {
-        $cursos = CursoAcademico::all();
-        return view('profesores.create', compact('cursos'));
+        $modulos = Modulo::all();
+        return view('profesores.create', compact('modulos'));
     }
 
-    /**
-     * Crear profesor.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            'cursos' => ['array'],
-            'cursos.*' => ['exists:cursos_academicos,id'],
+            'modulos' => ['array'],
+            'modulos.*' => ['exists:modulos,id'],
         ]);
 
         $user = User::create([
@@ -48,37 +39,27 @@ class ProfesorController extends Controller
             'rol' => 'profesor',
         ]);
 
-        if ($request->has('cursos')) {
-            $user->cursos()->sync($request->cursos);
+        if ($request->has('modulos')) {
+            $user->modulos()->sync($request->modulos);
         }
 
         return redirect()->route('profesores.index')->with('success', 'Profesor creado correctamente.');
     }
 
-    /**
-     * Mostrar un profesor
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Formulario de edición
-     */
     public function edit(string $id)
     {
-        $profesor = User::findOrFail($id);
-        $cursos = CursoAcademico::all();
+        $profesor = User::with('modulos')->findOrFail($id);
+        $modulos = Modulo::all();
+        $modulosAsignados = $profesor->modulos->pluck('id')->toArray();
 
-        $cursosAsignados = $profesor->cursos->pluck('id')->toArray();
-        
-        return view('profesores.edit', compact('profesor', 'cursos', 'cursosAsignados'));
+        return view('profesores.edit', compact('profesor', 'modulos', 'modulosAsignados'));
     }
 
-    /**
-     * Actualizar profesor.
-     */
     public function update(Request $request, string $id)
     {
         $profesor = User::findOrFail($id);
@@ -87,8 +68,8 @@ class ProfesorController extends Controller
             'nombre' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($profesor->id)],
             'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            'cursos' => ['array'],
-            'cursos.*' => ['exists:cursos_academicos,id'],
+            'modulos' => ['array'],
+            'modulos.*' => ['exists:modulos,id'],
         ]);
 
         $profesor->nombre = $request->nombre;
@@ -98,25 +79,22 @@ class ProfesorController extends Controller
         }
         $profesor->save();
 
-        if ($request->has('cursos')) {
-            $profesor->cursos()->sync($request->cursos);
+        if ($request->has('modulos')) {
+            $profesor->modulos()->sync($request->modulos);
         } else {
-            $profesor->cursos()->detach();
+            $profesor->modulos()->detach();
         }
 
         return redirect()->route('profesores.index')->with('success', 'Profesor actualizado correctamente.');
     }
 
-    /**
-     * Eliminar profesor.
-     */
     public function destroy(string $id)
     {
         $profesor = User::findOrFail($id);
         if ($profesor->rol !== 'profesor') {
              return redirect()->route('profesores.index')->with('error', 'No puedes eliminar este usuario.');
         }
-        
+
         $profesor->delete();
         return redirect()->route('profesores.index')->with('success', 'Profesor eliminado correctamente.');
     }
