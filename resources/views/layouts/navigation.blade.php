@@ -98,6 +98,34 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Tablero') }}
             </x-responsive-nav-link>
+
+            @if(Auth::user()->rol === 'admin' || Auth::user()->rol === 'profesor')
+                <x-responsive-nav-link :href="route('cursos.index')" :active="request()->routeIs('cursos.*')">
+                    {{ __('Cursos Académicos') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('modulos.index')" :active="request()->routeIs('modulos.*')">
+                    {{ __('Módulos') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('alumnos.index')" :active="request()->routeIs('alumnos.index', 'alumnos.create', 'alumnos.edit', 'alumnos.show')">
+                    {{ __('Alumnos') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('empresas.index')" :active="request()->routeIs('empresas.*')">
+                    {{ __('Empresas') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('convenios.index')" :active="request()->routeIs('convenios.*')">
+                    {{ __('Convenios') }}
+                </x-responsive-nav-link>
+
+                @if(Auth::user()->rol === 'admin')
+                    <x-responsive-nav-link :href="route('profesores.index')" :active="request()->routeIs('profesores.*')">
+                        {{ __('Profesores') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endif
         </div>
 
         <!-- Configuración Responsive -->

@@ -12,11 +12,11 @@
                     
 
                     
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
                         <h3 class="text-lg font-bold">Listado de Alumnos</h3>
                         
                         <!-- Buscador y Filtros -->
-                        <form method="GET" action="{{ route('alumnos.index') }}" class="flex" x-data="{ 
+                        <form method="GET" action="{{ route('alumnos.index') }}" class="flex flex-wrap gap-2 items-center" x-data="{ 
                             search: '{{ request('search') }}',
                             async performSearch() {
                                 let url = new URL(window.location.href);
@@ -32,7 +32,7 @@
                                 document.getElementById('alumnos-table-body').innerHTML = html;
                             }
                         }">
-                            <select name="curso_academico_id" class="rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm mr-2" onchange="this.form.submit()">
+                            <select name="curso_academico_id" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm" onchange="this.form.submit()">
                                 <option value="">Todos los Cursos</option>
                                 @foreach($cursos as $curso)
                                     <option value="{{ $curso->id }}" {{ request('curso_academico_id') == $curso->id ? 'selected' : '' }}>
@@ -41,7 +41,7 @@
                                 @endforeach
                             </select>
 
-                            <select name="curso_id" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm mr-2 w-64" onchange="this.form.submit()">
+                            <select name="curso_id" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm w-full sm:w-auto" onchange="this.form.submit()">
                                 <option value="">Todos los Módulos</option>
                                 @foreach($cursosDisponibles as $c)
                                     <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>
@@ -49,13 +49,16 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar por nombre o DNI..." class="w-64 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300">
-                                Buscar
-                            </button>
+
+                            <div class="flex w-full sm:w-auto">
+                                <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar por nombre o DNI..." class="flex-1 sm:w-52 rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300">
+                                    Buscar
+                                </button>
+                            </div>
                         </form>
 
-                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-alumno')" class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-alumno')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 self-start sm:self-auto">
                             Nuevo Alumno
                         </button>
                     </div>

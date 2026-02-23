@@ -90,6 +90,10 @@
                                 <span class="block text-orange-700 font-bold mb-1">Cursos Académicos</span>
                                 <span class="text-xs text-orange-600">Administrar años escolares</span>
                             </a>
+                            <a href="{{ route('modulos.index') }}" class="block p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg text-center transition duration-300">
+                                <span class="block text-yellow-700 font-bold mb-1">Módulos</span>
+                                <span class="text-xs text-yellow-600">Gestionar módulos formativos</span>
+                            </a>
                             <a href="{{ route('alumnos.index') }}" class="block p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg text-center transition duration-300">
                                 <span class="block text-indigo-700 font-bold mb-1">Gestionar Alumnos</span>
                                 <span class="text-xs text-indigo-600">Ver listado completo</span>

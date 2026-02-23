@@ -31,14 +31,14 @@
                 <div class="p-6 text-gray-900">
                     
                     <!-- Navegación de Sección Convenios -->
-                    <div class="flex space-x-4 mb-6 border-b pb-4">
+                    <div class="flex flex-wrap gap-2 mb-6 border-b pb-4">
                         <a href="{{ route('convenios.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded-md font-medium transition duration-300">
                             Listado de Convenios
                         </a>
                         <a href="{{ route('convenios.create') }}" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition duration-300">
                             Nuevo Convenio
                         </a>
-                        <button @click="openConfigModal()" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition duration-300 flex items-center gap-2 mr-2">
+                        <button @click="openConfigModal()" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition duration-300 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
                             </svg>
@@ -55,11 +55,11 @@
                         </form>
                     </div>
 
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-3">
                         <h3 class="text-lg font-bold text-gray-800">Listado de Convenios</h3>
                         
                         <!-- Filtros y Buscador -->
-                        <form method="GET" action="{{ route('convenios.index') }}" class="flex flex-wrap gap-2 items-center">
+                        <form method="GET" action="{{ route('convenios.index') }}" class="flex flex-wrap gap-2 items-center w-full sm:w-auto">
                             
                             <!-- Filtro Curso -->
                             <select name="curso_academico_id" class="rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm" onchange="this.form.submit()">
@@ -81,8 +81,8 @@
                             </select>
 
                             <!-- Buscador -->
-                            <div class="flex">
-                                <input type="text" name="search" placeholder="Buscar por alumno o empresa..." value="{{ request('search') }}" class="rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
+                            <div class="flex w-full sm:w-auto">
+                                <input type="text" name="search" placeholder="Buscar por alumno o empresa..." value="{{ request('search') }}" class="flex-1 sm:w-48 rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300 text-sm font-medium">
                                     Buscar
                                 </button>

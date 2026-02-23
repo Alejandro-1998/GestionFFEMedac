@@ -11,7 +11,7 @@
                 <div class="p-6 text-gray-900">
                     
                     <!-- Navegación de Sección Empresas -->
-                    <div class="flex space-x-4 mb-6 border-b pb-4">
+                    <div class="flex flex-wrap gap-2 mb-6 border-b pb-4">
                         <a href="{{ route('empresas.index') }}" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition duration-300">
                             Empresas
                         </a>
@@ -23,11 +23,11 @@
                         </a>
                     </div>
 
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
                         <h3 class="text-lg font-bold text-gray-800">Listado de Empleados</h3>
                         
                         <!-- Buscador -->
-                        <form method="GET" action="{{ route('empleados.index') }}" class="flex" x-data="{ 
+                        <form method="GET" action="{{ route('empleados.index') }}" class="flex w-full sm:w-auto" x-data="{ 
                             search: '{{ request('search') }}',
                             async performSearch() {
                                 let url = new URL(window.location.protocol + '//' + window.location.host + window.location.pathname);
@@ -43,7 +43,7 @@
                                 document.getElementById('empleados-table-body').innerHTML = html;
                             }
                         }">
-                            <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar empleado..." class="rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
+                            <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar empleado..." class="flex-1 rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300 text-sm font-medium">
                                 Buscar
                             </button>

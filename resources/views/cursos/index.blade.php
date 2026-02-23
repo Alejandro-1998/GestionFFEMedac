@@ -12,11 +12,11 @@
                     
 
 
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
                         <h3 class="text-lg font-bold text-gray-800">Cursos Académicos</h3>
                         
                         <!-- Buscador -->
-                        <form method="GET" action="{{ route('cursos.index') }}" class="flex" x-data="{ 
+                        <form method="GET" action="{{ route('cursos.index') }}" class="flex w-full sm:w-auto" x-data="{ 
                             search: '{{ request('search') }}',
                             async performSearch() {
                                 let url = new URL(window.location.protocol + '//' + window.location.host + window.location.pathname);
@@ -32,14 +32,14 @@
                                 document.getElementById('cursos-grid').innerHTML = html;
                             }
                         }">
-                            <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar año..." class="rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
+                            <input type="text" name="search" x-model="search" @input.debounce.500ms="performSearch()" placeholder="Buscar año..." class="flex-1 rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-md transition duration-300 text-sm font-medium">
                                 Buscar
                             </button>
                         </form>
 
                         <!-- Botón para abrir modal de creación -->
-                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-curso')" class="ml-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-curso')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 self-start sm:self-auto">
                             Nuevo Curso
                         </button>
                     </div>

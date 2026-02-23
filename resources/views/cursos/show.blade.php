@@ -16,7 +16,7 @@
                         </a>
                     </div>
 
-                    <div class="flex justify-between items-start mb-6 border-b pb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 border-b pb-6 gap-3">
                         <div class="flex items-center gap-4">
                             <h3 class="text-3xl font-bold text-gray-900">{{ $curso->anyo }}</h3>
                             
@@ -113,7 +113,7 @@
 
                 <!-- Modules Section -->
                 <div class="mt-8" x-data="{ moduloToDeleteId: null, moduloToDeleteName: '', deleteUrlTemplate: '{{ route('modulos.destroy', 'PLACEHOLDER') }}' }">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
                         <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                             Módulos Asociados

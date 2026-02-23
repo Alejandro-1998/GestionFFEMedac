@@ -9,9 +9,9 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-4 flex justify-between items-center">
+            <div class="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <h1 class="text-2xl font-bold text-gray-800">Listado de Módulos (Global)</h1>
-                <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-modulo')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'crear-modulo')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 self-start sm:self-auto">
                     Nuevo Módulo
                 </button>
             </div>
