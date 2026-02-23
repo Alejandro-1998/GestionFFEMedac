@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cursos/{curso}/academico/{cursoAcademico}/alumnos', [AlumnoController::class, 'listadoPorCursoYAcademico'])->name('alumnos.curso-academico')->middleware('can:access-management');
     Route::get('/cursos/{curso}/academico/{cursoAcademico}/pdf', [AlumnoController::class, 'exportarPdfListado'])->name('alumnos.exportar-pdf')->middleware('can:access-management');
     Route::post('/cursos/{curso}/academico/{cursoAcademico}/importar', [AlumnoController::class, 'importarAlumnos'])->name('alumnos.importar')->middleware('can:access-management');
+    Route::delete('/alumnos/eliminar-seleccionados', [AlumnoController::class, 'destroyBulk'])->name('alumnos.destroyBulk')->middleware('can:access-management');
     Route::resource('alumnos', AlumnoController::class)->middleware('can:access-management');
     Route::resource('cursos', CursoAcademicoController::class);
     Route::post('/cursos/{id}/sync-modulos', [CursoAcademicoController::class, 'syncModulos'])->name('cursos.syncModulos')->middleware('can:access-management');

@@ -19,8 +19,13 @@ class EmpresaController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        if (!$user->can('admin')) {
+        if ($user->rol !== 'admin') {
+            // Los profesores solo ven empresas asociadas a sus mismos módulos
+            $modulosDelProfesor = $user->modulos->pluck('id');
 
+            $query->whereHas('modulos', function ($q) use ($modulosDelProfesor) {
+                $q->whereIn('modulos.id', $modulosDelProfesor);
+            });
         }
 
         if ($request->has('search')) {

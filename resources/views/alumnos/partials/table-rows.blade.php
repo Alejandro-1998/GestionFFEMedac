@@ -1,5 +1,12 @@
 @forelse ($alumnos as $alumno)
     <tr>
+        <td class="px-4 py-4 w-10 text-center">
+            <input type="checkbox"
+                   class="alumno-check"
+                   style="width:16px;height:16px;cursor:pointer;accent-color:#4f46e5;"
+                   value="{{ $alumno->id }}"
+                   onchange="typeof actualizarSeleccion === 'function' && actualizarSeleccion()">
+        </td>
         <td class="px-6 py-4 whitespace-nowrap">
             <a href="{{ route('alumnos.show', $alumno->id) }}" class="flex items-center hover:bg-gray-50 transition duration-150 ease-in-out p-1 rounded-md">
                 <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold mr-3">
@@ -64,8 +71,9 @@
     </tr>
 @empty
     <tr>
-        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
             No se encontraron alumnos que coincidan con la búsqueda.
         </td>
     </tr>
 @endforelse
+

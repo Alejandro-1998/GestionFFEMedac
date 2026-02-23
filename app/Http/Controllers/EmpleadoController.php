@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Empleado;
 use App\Models\Modulo;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EmpleadoController extends Controller
@@ -16,6 +16,18 @@ class EmpleadoController extends Controller
     public function index(Request $request)
     {
         $query = Empleado::query();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->rol !== 'admin') {
+            // Solo empleados de empresas asociadas a los módulos del profesor
+            $modulosDelProfesor = $user->modulos->pluck('id');
+
+            $query->whereHas('empresa.modulos', function ($q) use ($modulosDelProfesor) {
+                $q->whereIn('modulos.id', $modulosDelProfesor);
+            });
+        }
 
         if ($request->has('search')) {
             $search = $request->input('search');

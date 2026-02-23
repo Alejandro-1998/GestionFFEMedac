@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sede;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SedeController extends Controller
 {
@@ -13,6 +14,18 @@ class SedeController extends Controller
     public function index(Request $request)
     {
         $query = Sede::query();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->rol !== 'admin') {
+            // Solo sedes de empresas asociadas a los módulos del profesor
+            $modulosDelProfesor = $user->modulos->pluck('id');
+
+            $query->whereHas('empresa.modulos', function ($q) use ($modulosDelProfesor) {
+                $q->whereIn('modulos.id', $modulosDelProfesor);
+            });
+        }
 
         if ($request->has('search')) {
 

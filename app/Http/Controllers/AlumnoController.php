@@ -215,6 +215,21 @@ class AlumnoController extends Controller
     }
 
     /**
+     * Elimina varios Alumnos seleccionados.
+     */
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'ids'   => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:alumnos,id'],
+        ]);
+
+        $count = Alumno::whereIn('id', $request->ids)->delete();
+
+        return redirect()->back()->with('success', $count . ' alumno(s) eliminados correctamente.');
+    }
+
+    /**
      * Elimina un Alumno.
      */
     public function destroy(string $id)

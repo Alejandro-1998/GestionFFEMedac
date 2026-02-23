@@ -10,10 +10,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
-                    <div class="mb-6">
-                        <a href="{{ route('alumnos.index') }}" class="text-blue-600 hover:underline flex items-center">
-                            &larr; Volver a Alumnos
+                    <div class="mb-6 flex justify-between items-center">
+                        <a href="{{ url()->previous() }}" class="text-blue-600 hover:underline flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Volver
                         </a>
+                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'editar-alumno-show')"
+                                class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-all shadow-sm hover:shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Editar alumno
+                        </button>
                     </div>
 
                     <div class="flex items-center mb-6">
@@ -89,4 +95,25 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Editar alumno --}}
+    <x-modal name="editar-alumno-show" focusable maxWidth="3xl">
+        <div class="p-8">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Editar Alumno</h2>
+            <form method="POST" action="{{ route('alumnos.update', $alumno) }}">
+                @csrf
+                @method('PUT')
+                @include('alumnos.partials.form', ['alumno' => $alumno, 'cursos' => collect()])
+                <div class="mt-8 flex justify-end">
+                    <button type="button" x-on:click="$dispatch('close')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition duration-300 mr-2 mb-6">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition duration-300 mr-8 mb-6">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
 </x-app-layout>
