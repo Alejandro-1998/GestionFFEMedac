@@ -178,7 +178,7 @@
     </div>
 
     {{-- Modal de confirmación --}}
-    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
             <div class="flex items-start gap-4">
                 <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
